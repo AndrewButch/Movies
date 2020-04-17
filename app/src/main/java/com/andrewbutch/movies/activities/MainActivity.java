@@ -8,6 +8,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import com.andrewbutch.movies.MovieLoader;
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.data.MovieAdapter;
 import com.andrewbutch.movies.model.Movie;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +39,8 @@ public class MainActivity extends DaggerAppCompatActivity {
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
     private List<Movie> movies;
+    private MenuItem searchMenuItem;
+    private ProgressBar progressBar;
 
     @Inject
     MovieLoader loader;
@@ -45,6 +51,17 @@ public class MainActivity extends DaggerAppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
+
+        final FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchMenuItem.expandActionView();
+//                searchMenuItem.getActionView().requestFocus();
+            }
+        });
+
+        progressBar = findViewById(R.id.progressBar);
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.hasFixedSize();
@@ -83,17 +100,19 @@ public class MainActivity extends DaggerAppCompatActivity {
     }
 
     private void getMovies(String search) {
-//        loader = new MovieLoader();
+        progressBar.setVisibility(View.VISIBLE);
         loader.loadMovies(search, new MovieLoader.OnCompleteListener() {
             @Override
             public void onLoadComplete() {
                 movies = loader.getMovies();
                 adapter.setData(movies);
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onLoadFailure() {
                 Toast.makeText(MainActivity.this, "Error loading", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -125,7 +144,8 @@ public class MainActivity extends DaggerAppCompatActivity {
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchMenuItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
