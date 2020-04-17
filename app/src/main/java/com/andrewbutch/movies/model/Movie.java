@@ -42,10 +42,16 @@ package com.andrewbutch.movies.model;
 }*/
 
 
+import com.google.gson.annotations.SerializedName;
+
 public class Movie {
+    @SerializedName("Poster")
     private String posterUrl;
+    @SerializedName("Title")
     private String title;
+    @SerializedName("Year")
     private String year;
+
 //    private String duration;
 //    private String imdbRating;
 

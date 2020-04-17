@@ -17,18 +17,17 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
-    private Context context;
     private List<Movie> movies;
+    private LayoutInflater inflater;
 
-    public MovieAdapter(Context context, List<Movie> movies) {
-        this.context = context;
-        this.movies = movies;
+    public MovieAdapter(Context context) {
+        inflater = LayoutInflater.from(context);
     }
 
     @NonNull
     @Override
     public MoviewVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.movie_item, parent, false);
+        View view = inflater.inflate(R.layout.movie_item, parent, false);
         return new MoviewVH(view);
     }
 
@@ -39,7 +38,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        return movies == null ? 0 : movies.size();
+    }
+
+    public void setData(List<Movie> movies) {
+        this.movies = movies;
+        notifyDataSetChanged();
     }
 
     public class MoviewVH extends RecyclerView.ViewHolder {
@@ -52,7 +56,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
 
         public MoviewVH(@NonNull View itemView) {
             super(itemView);
-
             posterImage = itemView.findViewById(R.id.poster_image);
             title = itemView.findViewById(R.id.title_tv);
             year = itemView.findViewById(R.id.year_tv);

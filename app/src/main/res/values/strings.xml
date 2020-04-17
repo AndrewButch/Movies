@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Movies</string>
+    <string name="search_hint">Название фильма...</string>
+    <string name="menu_search_title">Поиск фильма</string>
 </resources>
