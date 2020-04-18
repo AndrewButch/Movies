@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.MovieLoader;
+import com.andrewbutch.movies.NetworkStatusWatcher;
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.data.MovieAdapter;
 import com.andrewbutch.movies.model.Movie;
@@ -41,6 +44,8 @@ public class MainActivity extends DaggerAppCompatActivity {
     private List<Movie> movies;
     private MenuItem searchMenuItem;
     private ProgressBar progressBar;
+    private NetworkStatusWatcher networkStatusWatcher;
+    private boolean networkConnected;
 
     @Inject
     MovieLoader loader;
@@ -57,7 +62,7 @@ public class MainActivity extends DaggerAppCompatActivity {
             @Override
             public void onClick(View v) {
                 searchMenuItem.expandActionView();
-//                searchMenuItem.getActionView().requestFocus();
+                searchMenuItem.getActionView().requestFocus();
             }
         });
 
@@ -71,6 +76,9 @@ public class MainActivity extends DaggerAppCompatActivity {
         movies = new ArrayList<>();
 
         recyclerView.setAdapter(adapter);
+
+        networkStatusWatcher = new NetworkStatusWatcher(this);
+        registerReceiver(networkStatusWatcher, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         checkInternetPermission();
     }
 
@@ -100,21 +108,25 @@ public class MainActivity extends DaggerAppCompatActivity {
     }
 
     private void getMovies(String search) {
-        progressBar.setVisibility(View.VISIBLE);
-        loader.loadMovies(search, new MovieLoader.OnCompleteListener() {
-            @Override
-            public void onLoadComplete() {
-                movies = loader.getMovies();
-                adapter.setData(movies);
-                progressBar.setVisibility(View.GONE);
-            }
+        if (networkConnected) {
+            progressBar.setVisibility(View.VISIBLE);
+            loader.loadMovies(search, new MovieLoader.OnCompleteListener() {
+                @Override
+                public void onLoadComplete() {
+                    movies = loader.getMovies();
+                    adapter.setData(movies);
+                    progressBar.setVisibility(View.GONE);
+                }
 
-            @Override
-            public void onLoadFailure() {
-                Toast.makeText(MainActivity.this, "Error loading", Toast.LENGTH_SHORT).show();
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+                @Override
+                public void onLoadFailure() {
+                    Toast.makeText(MainActivity.this, "Error loading", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+        } else {
+            Toast.makeText(MainActivity.this, "No network connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -127,6 +139,16 @@ public class MainActivity extends DaggerAppCompatActivity {
         setIntent(intent);
         handleIntent(intent);
         super.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkStatusWatcher);
+    }
+
+    public void setNetworkConnected(boolean isConnected) {
+        this.networkConnected = isConnected;
     }
 
     private void handleIntent(Intent intent) {
