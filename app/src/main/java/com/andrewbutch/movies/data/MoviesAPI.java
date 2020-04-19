@@ -1,6 +1,6 @@
-package com.andrewbutch.movies;
+package com.andrewbutch.movies.data;
 
-import com.andrewbutch.movies.model.Search;
+import com.andrewbutch.movies.domain.model.Search;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

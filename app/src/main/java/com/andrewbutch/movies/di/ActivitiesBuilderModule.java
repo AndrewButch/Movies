@@ -1,6 +1,6 @@
 package com.andrewbutch.movies.di;
 
-import com.andrewbutch.movies.activities.MainActivity;
+import com.andrewbutch.movies.ui.MainActivity;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

@@ -1,7 +1,7 @@
-package com.andrewbutch.movies;
+package com.andrewbutch.movies.data;
 
-import com.andrewbutch.movies.model.Movie;
-import com.andrewbutch.movies.model.Search;
+import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.domain.model.Search;
 import com.andrewbutch.movies.utils.Constatnts;
 
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -16,7 +17,7 @@ import retrofit2.Response;
 public class MovieLoader {
 
     private MoviesAPI moviesAPI;
-    private List<Movie> movies;
+    private List<MoviePreview> movies;
 
     @Inject
     public MovieLoader(MoviesAPI moviesAPI) {
@@ -25,6 +26,7 @@ public class MovieLoader {
 
     public void loadMovies(String search, final OnCompleteListener callback) {
         Call<Search> callMovies =  moviesAPI.getSearchMovies(search, Constatnts.API_KEY);
+        Request req = callMovies.request();
         callMovies.enqueue(new Callback<Search>() {
             @Override
             public void onResponse(Call<Search> call, Response<Search> response) {
@@ -33,7 +35,7 @@ public class MovieLoader {
                     movies = search.getMoviesSearch();
                     if (movies == null) {
                         movies = new ArrayList<>();
-                        Movie noResult = new Movie();
+                        MoviePreview noResult = new MoviePreview();
                         noResult.setTitle("Не найдено фильмов");
                         movies.add(noResult);
                     }
@@ -49,7 +51,7 @@ public class MovieLoader {
     }
 
 
-    public List<Movie> getMovies() {
+    public List<MoviePreview> getMovies() {
         return movies;
     }
 

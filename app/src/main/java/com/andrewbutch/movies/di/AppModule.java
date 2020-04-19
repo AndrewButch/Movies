@@ -1,6 +1,6 @@
 package com.andrewbutch.movies.di;
 
-import com.andrewbutch.movies.MoviesAPI;
+import com.andrewbutch.movies.data.MoviesAPI;
 import com.andrewbutch.movies.utils.Constatnts;
 
 import dagger.Module;

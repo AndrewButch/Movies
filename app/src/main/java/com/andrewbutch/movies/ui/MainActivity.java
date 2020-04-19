@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.activities;
+package com.andrewbutch.movies.ui;
 
 import android.Manifest;
 import android.app.SearchManager;
@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,11 +23,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.andrewbutch.movies.MovieLoader;
-import com.andrewbutch.movies.NetworkStatusWatcher;
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.data.MovieAdapter;
-import com.andrewbutch.movies.model.Movie;
+import com.andrewbutch.movies.data.MovieLoader;
+import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -37,15 +36,18 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerAppCompatActivity;
 
 public class MainActivity extends DaggerAppCompatActivity {
+    private static final String TAG = "MainActivity";
     public static final int RC_PERMISSION_INTERNET = 123;
 
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
-    private List<Movie> movies;
+    private List<MoviePreview> movies;
     private MenuItem searchMenuItem;
     private ProgressBar progressBar;
     private NetworkStatusWatcher networkStatusWatcher;
     private boolean networkConnected;
+    private SearchView searchView;
+    private FloatingActionButton fab;
 
     @Inject
     MovieLoader loader;
@@ -57,14 +59,13 @@ public class MainActivity extends DaggerAppCompatActivity {
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
 
-        final FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchMenuItem.expandActionView();
-                searchMenuItem.getActionView().requestFocus();
-            }
+        fab = findViewById(R.id.fab);
+
+        fab.setOnClickListener(v -> {
+            searchMenuItem.expandActionView();
+            searchMenuItem.getActionView().requestFocus();
         });
+
 
         progressBar = findViewById(R.id.progressBar);
 
@@ -80,12 +81,19 @@ public class MainActivity extends DaggerAppCompatActivity {
         networkStatusWatcher = new NetworkStatusWatcher(this);
         registerReceiver(networkStatusWatcher, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         checkInternetPermission();
+
+        if (savedInstanceState != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            movies = loader.getMovies();
+            adapter.setData(movies);
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     private void checkInternetPermission() {
         int permissionStatus = ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
         if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
-            getMovies("Star Wars");
+            checkOldRequestData();
         } else {
             ActivityCompat.requestPermissions(
                     this,
@@ -100,7 +108,7 @@ public class MainActivity extends DaggerAppCompatActivity {
         switch (requestCode) {
             case RC_PERMISSION_INTERNET:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getMovies("Star Wars");
+                    checkOldRequestData();
                 } else {
                     throw new RuntimeException("Need internet permission");
                 }
@@ -131,6 +139,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     @Override
     public boolean onSearchRequested() {
+        Log.d(TAG, "onSearchRequested: ");
         return super.onSearchRequested();
     }
 
@@ -151,9 +160,17 @@ public class MainActivity extends DaggerAppCompatActivity {
         this.networkConnected = isConnected;
     }
 
+    private void checkOldRequestData() {
+        movies = loader.getMovies();
+        if (movies != null) {
+            adapter.setData(movies);
+        }
+    }
+
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            searchMenuItem.collapseActionView();
             getMovies(query);
         }
     }
@@ -167,11 +184,23 @@ public class MainActivity extends DaggerAppCompatActivity {
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+        searchMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                fab.hide();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                fab.show();
+                return true;
+            }
+        });
+        searchView = (SearchView) searchMenuItem.getActionView();
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
         return true;
     }
 }

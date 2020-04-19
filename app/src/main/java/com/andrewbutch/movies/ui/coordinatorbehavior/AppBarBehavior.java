@@ -1,4 +1,4 @@
-package com.andrewbutch.movies;
+package com.andrewbutch.movies.ui.coordinatorbehavior;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -10,9 +10,9 @@ import androidx.core.view.ViewCompat;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class FAB_Behavior extends AppBarLayout.Behavior {
+public class AppBarBehavior extends AppBarLayout.Behavior {
 
-    public FAB_Behavior(Context context, AttributeSet attrs) {
+    public AppBarBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

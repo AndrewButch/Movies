@@ -1,12 +1,10 @@
-package com.andrewbutch.movies;
+package com.andrewbutch.movies.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
-import com.andrewbutch.movies.activities.MainActivity;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 

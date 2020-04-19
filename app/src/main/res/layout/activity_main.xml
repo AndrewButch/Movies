@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-        app:layout_behavior=".FAB_Behavior"
+        app:layout_behavior=".ui.coordinatorbehavior.AppBarBehavior"
 >
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -29,6 +29,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
         tools:listitem="@layout/movie_item"
+        android:background="@color/background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -41,7 +42,8 @@
         app:layout_anchor="@id/recycler_view"
         app:layout_anchorGravity="bottom|right|end"
         android:clickable="true"
-        app:srcCompat="@drawable/ic_search_black_24dp" />
+        app:srcCompat="@drawable/ic_search_black_24dp"
+        app:layout_behavior=".ui.coordinatorbehavior.FabHideBehaviour"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
