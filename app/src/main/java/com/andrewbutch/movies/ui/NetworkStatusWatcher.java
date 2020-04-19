@@ -10,11 +10,10 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class NetworkStatusWatcher extends BroadcastReceiver {
     ConnectivityManager connectivityManager;
-    MainActivity mainActivity;
+    boolean isNetworkConnected;
 
-    public NetworkStatusWatcher(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-        connectivityManager = (ConnectivityManager) mainActivity.getSystemService(CONNECTIVITY_SERVICE);
+    public NetworkStatusWatcher(Context context) {
+        connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
         checkConnection();
     }
 
@@ -25,14 +24,16 @@ public class NetworkStatusWatcher extends BroadcastReceiver {
         }
     }
 
+    public boolean isNetworkConnected() {
+        return isNetworkConnected;
+    }
+
     private void checkConnection() {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.getState() ==  NetworkInfo.State.CONNECTED) {
-            // Connected
-            mainActivity.setNetworkConnected(true);
+            isNetworkConnected = true;
         } else {
-            // No connect
-            mainActivity.setNetworkConnected(false);
+            isNetworkConnected = false;
         }
     }
 }

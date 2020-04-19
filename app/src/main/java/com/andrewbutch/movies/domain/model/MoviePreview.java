@@ -38,6 +38,8 @@ public class MoviePreview {
     private String title;
     @SerializedName("Year")
     private String year;
+    @SerializedName("imdbID")
+    private String id;
 
     public String getPosterUrl() {
         return posterUrl;
@@ -61,5 +63,13 @@ public class MoviePreview {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

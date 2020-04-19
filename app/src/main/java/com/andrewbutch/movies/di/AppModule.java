@@ -1,7 +1,13 @@
 package com.andrewbutch.movies.di;
 
+import com.andrewbutch.movies.data.MovieLoader;
 import com.andrewbutch.movies.data.MoviesAPI;
+import com.andrewbutch.movies.data.MoviesRepository;
+import com.andrewbutch.movies.domain.MoviesUseCase;
+import com.andrewbutch.movies.domain.Repository;
 import com.andrewbutch.movies.utils.Constatnts;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -10,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 abstract class AppModule {
-
+    @Singleton
     @Provides
     static Retrofit provideRetrofit() {
         return new Retrofit.Builder()
@@ -19,8 +25,21 @@ abstract class AppModule {
                 .build();
     }
 
+    @Singleton
     @Provides
     static MoviesAPI provideMovieApi(Retrofit retrofit) {
         return retrofit.create(MoviesAPI.class);
+    }
+
+    @Singleton
+    @Provides
+    static Repository provideRepository(MovieLoader loader) {
+        return new MoviesRepository(loader);
+    }
+
+    @Singleton
+    @Provides
+    static MoviesUseCase provideUseCase(Repository repository) {
+        return new MoviesUseCase(repository);
     }
 }

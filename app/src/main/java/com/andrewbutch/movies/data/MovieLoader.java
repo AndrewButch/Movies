@@ -1,5 +1,7 @@
 package com.andrewbutch.movies.data;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.domain.model.Search;
 import com.andrewbutch.movies.utils.Constatnts;
@@ -18,6 +20,7 @@ public class MovieLoader {
 
     private MoviesAPI moviesAPI;
     private List<MoviePreview> movies;
+    private MutableLiveData<List<MoviePreview>> moviesLiveData;
 
     @Inject
     public MovieLoader(MoviesAPI moviesAPI) {
@@ -33,6 +36,8 @@ public class MovieLoader {
                 Search search = response.body();
                 if (search != null) {
                     movies = search.getMoviesSearch();
+                    moviesLiveData = new MutableLiveData<>();
+                    moviesLiveData.setValue(movies);
                     if (movies == null) {
                         movies = new ArrayList<>();
                         MoviePreview noResult = new MoviePreview();
