@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.ui;
+package com.andrewbutch.movies.ui.main;
 
 import android.Manifest;
 import android.app.SearchManager;
@@ -19,12 +19,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.domain.MoviesUseCase;
 import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.ui.NetworkStatusWatcher;
+import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
+import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -46,6 +50,9 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     private NetworkStatusWatcher networkStatusWatcher;
 
+    MainViewModel viewModel;
+    @Inject
+    MainViewModelFactory providerFactory;
     @Inject
     MoviesUseCase useCase;
 
@@ -81,13 +88,31 @@ public class MainActivity extends DaggerAppCompatActivity {
 
         recyclerView.setAdapter(adapter);
 
-
         checkInternetPermission();
 
         if (savedInstanceState != null) {
             // check last seaarch recult
-            getSearchResult();
+//            getSearchResult();
         }
+        viewModel = new ViewModelProvider(this, providerFactory).get(MainViewModel.class);
+        viewModel.observeMovieSearch().observe(this, listSearchResource -> {
+            switch (listSearchResource.status) {
+                case LOADING:
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    break;
+                case COMPLETE:
+                    progressBar.setVisibility(View.GONE);
+                    List<MoviePreview> list = listSearchResource.data;
+                    if (list != null) {
+                        adapter.setData(list);
+                    }
+                    break;
+                case ERROR:
+                    progressBar.setVisibility(View.GONE);
+                    break;
+            }
+        });
     }
 
     @Override
@@ -96,7 +121,7 @@ public class MainActivity extends DaggerAppCompatActivity {
         unregisterReceiver(networkStatusWatcher);
     }
 
-    // Handle intent from Search
+    // Intent intercept for finding Intent.ACTION_SEARCH
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
@@ -160,33 +185,20 @@ public class MainActivity extends DaggerAppCompatActivity {
         }
     }
 
-    private void getMovies(String search) {
-        if (networkStatusWatcher.isNetworkConnected) {
-            progressBar.setVisibility(View.VISIBLE);
-            useCase.searchMovies(search, new MoviesUseCase.SearchMoviesCallback() {
-                @Override
-                public void onComplete() {
-                    getSearchResult();
-                    progressBar.setVisibility(View.GONE);
-                }
-            });
-        } else {
-            Toast.makeText(MainActivity.this, "No network connection", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void getSearchResult() {
-        List<MoviePreview> movies = useCase.getSearchResult();
-        if (movies.size() > 0) {
-            adapter.setData(movies);
-        }
-    }
-
+    // Handle intent with Intent.ACTION_SEARCH
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             searchMenuItem.collapseActionView();
-            getMovies(query);
+            searchMovies(query);
+        }
+    }
+
+    private void searchMovies(String search) {
+        if (networkStatusWatcher.isNetworkConnected()) {
+            viewModel.search(search);
+        } else {
+            Toast.makeText(MainActivity.this, "No network connection", Toast.LENGTH_SHORT).show();
         }
     }
 }

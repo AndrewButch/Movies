@@ -9,8 +9,8 @@ import android.net.NetworkInfo;
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 public class NetworkStatusWatcher extends BroadcastReceiver {
-    ConnectivityManager connectivityManager;
-    boolean isNetworkConnected;
+    private ConnectivityManager connectivityManager;
+    private boolean isNetworkConnected;
 
     public NetworkStatusWatcher(Context context) {
         connectivityManager = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);

@@ -1,70 +1,46 @@
 package com.andrewbutch.movies.data;
 
-import com.andrewbutch.movies.domain.MoviesUseCase;
-import com.andrewbutch.movies.domain.Repository;
-import com.andrewbutch.movies.domain.model.Movie;
-import com.andrewbutch.movies.domain.model.MoviePreview;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
-import java.util.Collections;
+import com.andrewbutch.movies.domain.Repository;
+import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.ui.main.SearchResource;
+
 import java.util.List;
 
 import javax.inject.Inject;
 
 public class MoviesRepository implements Repository {
     private MovieLoader loader;
-    private List<MoviePreview> moviePreviews;
-    private List<Movie> movies;
+    private MutableLiveData<SearchResource<List<MoviePreview>>> moviesPreviewLiveData;
 
     @Inject
     public MoviesRepository(MovieLoader loader) {
         this.loader = loader;
+        moviesPreviewLiveData = new MutableLiveData<>();
+        SearchResource<List<MoviePreview>> resource = SearchResource.complete(null);
+        moviesPreviewLiveData.setValue(resource);
     }
 
     @Override
-    public List<MoviePreview> getLastSearchResult() {
-        if (moviePreviews == null) {
-            return Collections.emptyList();
-        }
-        return moviePreviews;
+    public void searchMovie(String search) {
+        loadMoviesBySearch(search);
+        SearchResource<List<MoviePreview>> resource = SearchResource.loading(null);
+        moviesPreviewLiveData.setValue(resource);
     }
 
     @Override
-    public void insertMovie(MoviePreview movie) {
-
+    public LiveData<SearchResource<List<MoviePreview>>> getMovieSearch() {
+        return moviesPreviewLiveData;
     }
 
-    @Override
-    public void insertMovie(List<MoviePreview> movies) {
-
-    }
-
-    @Override
-    public Movie getMovieByID(String movieId) {
-        return null;
-    }
-
-    @Override
-    public void addMovie(Movie movie) {
-
-    }
-
-    @Override
-    public List<String> getSearchRequests() {
-        return null;
-    }
-
-    @Override
-    public void insertSearchRequest(String request) {
-
-    }
-
-    @Override
-    public void loadMoviesBySearch(String search, MoviesUseCase.SearchMoviesCallback callback) {
+    private void loadMoviesBySearch(String search) {
         loader.loadMovies(search, new MovieLoader.OnCompleteListener() {
             @Override
             public void onLoadComplete() {
-                moviePreviews = loader.getMovies();
-                callback.onComplete();
+                SearchResource<List<MoviePreview>> resource = SearchResource.complete(loader.getMovies());
+                moviesPreviewLiveData.setValue(resource);
             }
 
             @Override

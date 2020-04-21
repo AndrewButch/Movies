@@ -3,7 +3,6 @@ package com.andrewbutch.movies.di;
 import com.andrewbutch.movies.data.MovieLoader;
 import com.andrewbutch.movies.data.MoviesAPI;
 import com.andrewbutch.movies.data.MoviesRepository;
-import com.andrewbutch.movies.domain.MoviesUseCase;
 import com.andrewbutch.movies.domain.Repository;
 import com.andrewbutch.movies.utils.Constatnts;
 
@@ -37,9 +36,5 @@ abstract class AppModule {
         return new MoviesRepository(loader);
     }
 
-    @Singleton
-    @Provides
-    static MoviesUseCase provideUseCase(Repository repository) {
-        return new MoviesUseCase(repository);
-    }
+
 }

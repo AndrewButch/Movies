@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.ui;
+package com.andrewbutch.movies.ui.main;
 
 import android.content.Context;
 import android.view.LayoutInflater;

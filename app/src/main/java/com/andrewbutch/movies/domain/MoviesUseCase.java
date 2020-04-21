@@ -1,6 +1,9 @@
 package com.andrewbutch.movies.domain;
 
+import androidx.lifecycle.LiveData;
+
 import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.List;
 
@@ -14,15 +17,11 @@ public class MoviesUseCase {
         this.repository = repository;
     }
 
-    public void searchMovies(String search, SearchMoviesCallback callback) {
-        repository.loadMoviesBySearch(search, callback);
+    public void searchMovies(String search) {
+        repository.searchMovie(search);
     }
 
-    public List<MoviePreview> getSearchResult() {
-        return repository.getLastSearchResult();
-    }
-
-    public interface SearchMoviesCallback {
-        void onComplete();
+    public LiveData<SearchResource<List<MoviePreview>>> getMovieSearch() {
+        return repository.getMovieSearch();
     }
 }
