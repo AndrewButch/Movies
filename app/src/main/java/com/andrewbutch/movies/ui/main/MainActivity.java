@@ -20,41 +20,33 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.domain.MoviesUseCase;
-import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerAppCompatActivity;
 
-public class MainActivity extends DaggerAppCompatActivity {
+public class MainActivity extends DaggerAppCompatActivity implements MainView {
     private static final String TAG = "MainActivity";
     public static final int RC_PERMISSION_INTERNET = 123;
 
-    private RecyclerView recyclerView;
-    private MovieAdapter adapter;
     private SearchView searchView;
     private FloatingActionButton fab;
     private MenuItem searchMenuItem;
     private ProgressBar progressBar;
-
+    private NavController navController;
     private NetworkStatusWatcher networkStatusWatcher;
 
     MainViewModel viewModel;
     @Inject
     MainViewModelFactory providerFactory;
-    @Inject
-    MoviesUseCase useCase;
 
     @Override
     protected void onResume() {
@@ -73,44 +65,24 @@ public class MainActivity extends DaggerAppCompatActivity {
         fab = findViewById(R.id.fab);
         // fab activates search
         fab.setOnClickListener(v -> {
-            searchMenuItem.expandActionView();
-            searchMenuItem.getActionView().requestFocus();
+//            searchMenuItem.expandActionView();
+//            searchMenuItem.getActionView().requestFocus();
+            navToDetail();
         });
 
 
         progressBar = findViewById(R.id.progressBar);
 
-        recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.hasFixedSize();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        adapter = new MovieAdapter(this);
-
-        recyclerView.setAdapter(adapter);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
         checkInternetPermission();
 
-        if (savedInstanceState != null) {
-            // check last seaarch recult
-//            getSearchResult();
-        }
         viewModel = new ViewModelProvider(this, providerFactory).get(MainViewModel.class);
         viewModel.observeMovieSearch().observe(this, listSearchResource -> {
-            switch (listSearchResource.status) {
-                case LOADING:
-                    progressBar.setVisibility(View.VISIBLE);
-
-                    break;
-                case COMPLETE:
-                    progressBar.setVisibility(View.GONE);
-                    List<MoviePreview> list = listSearchResource.data;
-                    if (list != null) {
-                        adapter.setData(list);
-                    }
-                    break;
-                case ERROR:
-                    progressBar.setVisibility(View.GONE);
-                    break;
+            if (listSearchResource.status == SearchResource.SearchStatus.LOADING){
+                progressBar.setVisibility(View.VISIBLE);
+            } else {
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -198,7 +170,21 @@ public class MainActivity extends DaggerAppCompatActivity {
         if (networkStatusWatcher.isNetworkConnected()) {
             viewModel.search(search);
         } else {
-            Toast.makeText(MainActivity.this, "No network connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No network connection", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void navToDetail() {
+        navController.navigate(R.id.action_mainFragment_to_detailFragment);
+    }
+
+    @Override
+    public void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgress() {
+        progressBar.setVisibility(View.GONE);
     }
 }
