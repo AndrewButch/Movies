@@ -1,5 +1,6 @@
 package com.andrewbutch.movies.data;
 
+import com.andrewbutch.movies.domain.model.Movie;
 import com.andrewbutch.movies.domain.model.Search;
 
 import retrofit2.Call;
@@ -14,4 +15,8 @@ public interface MoviesAPI {
     @GET("/")
     Call<Search> getSearchMovies(@Query("s") String searchText,
                                  @Query("apikey") String apiKey);
+
+    @GET("/")
+    Call<Movie> getSearchMoviesById(@Query("i") String movieId,
+                                    @Query("apikey") String apiKey);
 }

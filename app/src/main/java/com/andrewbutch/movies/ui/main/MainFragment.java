@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +25,7 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
-public class MainFragment extends DaggerFragment {
+public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHolderClickListener {
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
     private MainViewModel viewModel;
@@ -61,10 +60,10 @@ public class MainFragment extends DaggerFragment {
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.hasFixedSize();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new MovieAdapter(getContext());
+        adapter = new MovieAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
 
-        viewModel = new ViewModelProvider(this, providerFactory).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(getViewModelStore(), providerFactory).get(MainViewModel.class);
         viewModel.observeMovieSearch().observe(getViewLifecycleOwner(), listSearchResource -> {
             switch (listSearchResource.status) {
                 case LOADING:
@@ -84,13 +83,9 @@ public class MainFragment extends DaggerFragment {
         });
     }
 
-    private void searchMovies(String search) {
-        if (networkStatusWatcher.isNetworkConnected()) {
-            viewModel.search(search);
-        } else {
-            Toast.makeText(getContext(), "No network connection", Toast.LENGTH_SHORT).show();
-        }
+    @Override
+    public void onClick(String movieID) {
+        viewModel.setDetailMovieID(movieID);
+        view.navToDetailMovie();
     }
-
-
 }

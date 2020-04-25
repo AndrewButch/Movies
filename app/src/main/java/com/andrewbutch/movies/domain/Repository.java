@@ -2,6 +2,7 @@ package com.andrewbutch.movies.domain;
 
 import androidx.lifecycle.LiveData;
 
+import com.andrewbutch.movies.domain.model.Movie;
 import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.ui.main.SearchResource;
 
@@ -22,4 +23,7 @@ public interface Repository {
     LiveData<SearchResource<List<MoviePreview>>> getMovieSearch();
 
 
+    void setDetailMovieId(String movieId);
+
+    LiveData<SearchResource<Movie>> getDetailMovie();
 }

@@ -2,6 +2,7 @@ package com.andrewbutch.movies.domain;
 
 import androidx.lifecycle.LiveData;
 
+import com.andrewbutch.movies.domain.model.Movie;
 import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.ui.main.SearchResource;
 
@@ -23,5 +24,14 @@ public class MoviesUseCase {
 
     public LiveData<SearchResource<List<MoviePreview>>> getMovieSearch() {
         return repository.getMovieSearch();
+    }
+
+    public void setDetailMovie(String movieID) {
+        repository.setDetailMovieId(movieID);
+    }
+
+
+    public LiveData<SearchResource<Movie>> getDetailMovie() {
+        return repository.getDetailMovie();
     }
 }

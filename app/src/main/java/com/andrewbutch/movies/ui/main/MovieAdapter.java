@@ -19,9 +19,11 @@ import java.util.List;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
     private List<MoviePreview> movies;
     private LayoutInflater inflater;
+    private ViewHolderClickListener listener;
 
-    public MovieAdapter(Context context) {
+    public MovieAdapter(Context context, ViewHolderClickListener listener) {
         inflater = LayoutInflater.from(context);
+        this.listener = listener;
     }
 
     @NonNull
@@ -33,7 +35,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
 
     @Override
     public void onBindViewHolder(@NonNull MoviewVH holder, int position) {
-        holder.bind(movies.get(position));
+        holder.bind(movies.get(position), listener);
     }
 
     @Override
@@ -59,13 +61,25 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MoviewVH> {
             year = itemView.findViewById(R.id.year_tv);
         }
 
-        void bind(MoviePreview movie) {
+        void bind(MoviePreview movie, ViewHolderClickListener listener) {
             title.setText(movie.getTitle());
             year.setText(movie.getYear());
             Picasso.get().load(movie.getPosterUrl())
                     .fit()
                     .centerInside()
+                    .placeholder(R.drawable.ic_local_movies_black_24dp)
+                    .error(R.drawable.ic_error_outline_black_24dp)
                     .into(posterImage);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(movie.getId());
+                }
+            });
         }
+    }
+
+    interface ViewHolderClickListener {
+        void onClick(String movieID);
     }
 }

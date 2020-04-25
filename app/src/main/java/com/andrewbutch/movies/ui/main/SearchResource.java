@@ -3,9 +3,9 @@ package com.andrewbutch.movies.ui.main;
 import androidx.annotation.Nullable;
 
 public class SearchResource<T> {
-    SearchStatus status;
-    T data;
-    String message;
+    public SearchStatus status;
+    public T data;
+    public String message;
 
     public SearchResource(SearchStatus status, T data, String message) {
         this.status = status;

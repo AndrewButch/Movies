@@ -1,5 +1,6 @@
 package com.andrewbutch.movies.data;
 
+import com.andrewbutch.movies.domain.model.Movie;
 import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.domain.model.Search;
 import com.andrewbutch.movies.utils.Constatnts;
@@ -18,6 +19,7 @@ public class MovieLoader {
 
     private MoviesAPI moviesAPI;
     private List<MoviePreview> movies;
+    private Movie movie;
 
     @Inject
     public MovieLoader(MoviesAPI moviesAPI) {
@@ -25,6 +27,7 @@ public class MovieLoader {
     }
 
     public void loadMovies(String search, final OnCompleteListener callback) {
+        movie = null;
         Call<Search> callMovies =  moviesAPI.getSearchMovies(search, Constatnts.API_KEY);
         Request req = callMovies.request();
         callMovies.enqueue(new Callback<Search>() {
@@ -50,9 +53,34 @@ public class MovieLoader {
         });
     }
 
+    public void loadMovieById(String movieId, final OnCompleteListener callback) {
+        movie = null;
+        Call<Movie> callMovies =  moviesAPI.getSearchMoviesById(movieId, Constatnts.API_KEY);
+        Request req = callMovies.request();
+        callMovies.enqueue(new Callback<Movie>() {
+            @Override
+            public void onResponse(Call<Movie> call, Response<Movie> response) {
+                movie = response.body();
+                if (movie == null) {
+                    movie = new Movie();
+                    movie.setTitle("Ошибка при загрузке");
+                }
+                callback.onLoadComplete();
+            }
+
+            @Override
+            public void onFailure(Call<Movie> call, Throwable t) {
+                callback.onLoadFailure();
+            }
+        });
+    }
 
     public List<MoviePreview> getMovies() {
         return movies;
+    }
+
+    public Movie getMovie() {
+        return movie;
     }
 
     public interface OnCompleteListener {
