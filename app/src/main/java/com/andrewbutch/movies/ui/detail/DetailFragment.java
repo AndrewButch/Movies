@@ -35,6 +35,7 @@ public class DetailFragment extends DaggerFragment {
     private TextView title;
     private TextView year;
     private TextView rating;
+    private TextView duration;
 
 
     @Override
@@ -63,6 +64,7 @@ public class DetailFragment extends DaggerFragment {
         title = view.findViewById(R.id.title_tv);
         year = view.findViewById(R.id.year_tv);
         rating = view.findViewById(R.id.rating_tv);
+        duration = view.findViewById(R.id.duration_tv);
 
         viewModel.observeDetailMovie().observe(getViewLifecycleOwner(), movieSearchResource -> {
             switch (movieSearchResource.status) {
@@ -75,6 +77,7 @@ public class DetailFragment extends DaggerFragment {
 
                     title.setText(movie.getTitle());
                     year.setText(movie.getYear());
+                    duration.setText(movie.getDuration());
                     rating.setText(movie.getRating());
                     Picasso.get().load(movie.getPosterUrl())
                             .fit()
