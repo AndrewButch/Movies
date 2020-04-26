@@ -72,6 +72,7 @@ public class DetailFragment extends DaggerFragment {
                 case COMPLETE:
                     DetailFragment.this.view.hideProgress();
                     Movie movie = movieSearchResource.data;
+
                     title.setText(movie.getTitle());
                     year.setText(movie.getYear());
                     rating.setText(movie.getRating());

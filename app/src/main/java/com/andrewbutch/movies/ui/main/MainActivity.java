@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
@@ -189,10 +190,6 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             searchMenuItem.getActionView().requestFocus();
         });
 
-        setupNavController();
-    }
-
-    private void setupNavController() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             int destId = destination.getId();
@@ -207,5 +204,11 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
                     break;
             }
         });
+        NavigationUI.setupWithNavController(toolbar, navController);
+    }
+
+    private void setupNavController() {
+
+
     }
 }

@@ -4,12 +4,7 @@
 
     <item
         android:id="@+id/menu_fragment_hello"
-        android:icon="@android:drawable/btn_star"
-        android:title="Привет"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/menu_fragment_exit"
-        android:icon="@android:drawable/btn_dialog"
-        android:title="Пока"
+        android:icon="@drawable/ic_star_border_black_24dp"
+        android:title="Добавить в избранное"
         app:showAsAction="ifRoom"/>
 </menu>
