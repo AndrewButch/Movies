@@ -14,14 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.domain.MoviesUseCase;
 import com.andrewbutch.movies.domain.model.Movie;
 import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
-import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
@@ -29,14 +26,10 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 
 public class DetailFragment extends DaggerFragment {
-    private MainViewModel viewModel;
     private MainView view;
 
     @Inject
-    MainViewModelFactory providerFactory;
-
-    @Inject
-    MoviesUseCase useCase;
+    MainViewModel viewModel;
 
     private ImageView posterImage;
     private TextView title;
@@ -71,7 +64,6 @@ public class DetailFragment extends DaggerFragment {
         year = view.findViewById(R.id.year_tv);
         rating = view.findViewById(R.id.rating_tv);
 
-        viewModel = new ViewModelProvider(getViewModelStore(), providerFactory).get(MainViewModel.class);
         viewModel.observeDetailMovie().observe(getViewLifecycleOwner(), movieSearchResource -> {
             switch (movieSearchResource.status) {
                 case LOADING:
@@ -101,6 +93,7 @@ public class DetailFragment extends DaggerFragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
+        inflater.inflate(R.menu.detail_fragment_menu, menu);
     }
 
     @Override
@@ -109,9 +102,6 @@ public class DetailFragment extends DaggerFragment {
         switch (itemID) {
             case R.id.menu_fragment_hello:
                 Toast.makeText(getContext(), "Hello", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.menu_fragment_exit:
-                Toast.makeText(getContext(), "Bye", Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);

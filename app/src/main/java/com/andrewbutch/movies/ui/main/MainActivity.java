@@ -17,19 +17,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
-import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -46,18 +42,16 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     private MenuItem searchMenuItem;
     private ProgressBar progressBar;
     private NavController navController;
-    private NetworkStatusWatcher networkStatusWatcher;
-    private Toolbar toolbar;
     private AppBarLayout appBarLayout;
 
-    MainViewModel viewModel;
     @Inject
-    MainViewModelFactory providerFactory;
+    NetworkStatusWatcher networkStatusWatcher;
+    @Inject
+    MainViewModel viewModel;
 
     @Override
     protected void onResume() {
         super.onResume();
-        networkStatusWatcher = new NetworkStatusWatcher(this);
         registerReceiver(networkStatusWatcher, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
@@ -65,28 +59,12 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        appBarLayout = findViewById(R.id.app_bar);
-
-        fab = findViewById(R.id.fab);
-        // fab activates search
-        fab.setOnClickListener(v -> {
-            searchMenuItem.expandActionView();
-            searchMenuItem.getActionView().requestFocus();
-        });
-
-
-        progressBar = findViewById(R.id.progressBar);
-
-        setupNavController();
+        initViews();
 
         checkInternetPermission();
 
-        viewModel = new ViewModelProvider(this, providerFactory).get(MainViewModel.class);
         viewModel.observeMovieSearch().observe(this, listSearchResource -> {
-            if (listSearchResource.status == SearchResource.SearchStatus.LOADING){
+            if (listSearchResource.status == SearchResource.SearchStatus.LOADING) {
                 progressBar.setVisibility(View.VISIBLE);
             } else {
                 progressBar.setVisibility(View.GONE);
@@ -197,22 +175,36 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
         }
     }
 
+    private void initViews() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        appBarLayout = findViewById(R.id.app_bar);
+        progressBar = findViewById(R.id.progressBar);
+
+        fab = findViewById(R.id.fab);
+        // fab activates search
+        fab.setOnClickListener(v -> {
+            searchMenuItem.expandActionView();
+            searchMenuItem.getActionView().requestFocus();
+        });
+
+        setupNavController();
+    }
+
     private void setupNavController() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                int destId = destination.getId();
-                switch (destId) {
-                    case R.id.mainFragment:
-                        fab.show();
-                        appBarLayout.setExpanded(true);
-                        break;
-                    case R.id.detailFragment:
-                        fab.hide();
-                        appBarLayout.setExpanded(true);
-                        break;
-                }
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            int destId = destination.getId();
+            switch (destId) {
+                case R.id.mainFragment:
+                    fab.show();
+                    appBarLayout.setExpanded(true);
+                    break;
+                case R.id.detailFragment:
+                    fab.hide();
+                    appBarLayout.setExpanded(true);
+                    break;
             }
         });
     }

@@ -1,27 +1,24 @@
 package com.andrewbutch.movies.di;
 
-import com.andrewbutch.movies.domain.MoviesUseCase;
-import com.andrewbutch.movies.domain.Repository;
+import com.andrewbutch.movies.di.main.FragmentBuilderModule;
+import com.andrewbutch.movies.di.main.MainModule;
+import com.andrewbutch.movies.di.main.MainViewModelModule;
 import com.andrewbutch.movies.ui.main.MainActivity;
-import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 
 import dagger.Module;
-import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 
 @Module
 public abstract class ActivitiesBuilderModule {
 
-    @ContributesAndroidInjector(modules = FragmentBuilderModule.class)
+    @ContributesAndroidInjector(
+            modules = {
+                    FragmentBuilderModule.class,
+                    MainModule.class,
+                    MainViewModelModule.class,
+            }
+    )
     abstract MainActivity contributeMainActivity();
 
-    @Provides
-    static MoviesUseCase provideUseCase(Repository repository) {
-        return new MoviesUseCase(repository);
-    }
 
-    @Provides
-    static MainViewModelFactory provideMainViewModelFactory(MoviesUseCase useCase) {
-        return new MainViewModelFactory(useCase);
-    }
 }

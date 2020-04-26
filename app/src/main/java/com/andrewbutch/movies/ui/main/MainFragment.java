@@ -8,16 +8,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.domain.MoviesUseCase;
 import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
-import com.andrewbutch.movies.ui.main.viewmodel.MainViewModelFactory;
 
 import java.util.List;
 
@@ -28,17 +25,12 @@ import dagger.android.support.DaggerFragment;
 public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHolderClickListener {
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
-    private MainViewModel viewModel;
-
-    private NetworkStatusWatcher networkStatusWatcher;
-
     private MainView view;
 
     @Inject
-    MainViewModelFactory providerFactory;
+    NetworkStatusWatcher networkStatusWatcher;
     @Inject
-    MoviesUseCase useCase;
-
+    MainViewModel viewModel;
 
     @Override
     public void onAttach(Context context) {
@@ -56,14 +48,12 @@ public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHol
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        networkStatusWatcher = new NetworkStatusWatcher(getContext());
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.hasFixedSize();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new MovieAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
 
-        viewModel = new ViewModelProvider(getViewModelStore(), providerFactory).get(MainViewModel.class);
         viewModel.observeMovieSearch().observe(getViewLifecycleOwner(), listSearchResource -> {
             switch (listSearchResource.status) {
                 case LOADING:

@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.di;
+package com.andrewbutch.movies.di.main;
 
 import com.andrewbutch.movies.ui.detail.DetailFragment;
 import com.andrewbutch.movies.ui.main.MainFragment;

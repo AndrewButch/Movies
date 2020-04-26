@@ -10,9 +10,12 @@ import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class MainViewModel extends ViewModel {
     private MoviesUseCase useCase;
 
+    @Inject
     public MainViewModel(MoviesUseCase useCase) {
         this.useCase = useCase;
     }
