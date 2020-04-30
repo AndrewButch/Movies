@@ -60,10 +60,10 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        handleIntent(getIntent());
         initViews();
 
         checkInternetPermission();
-
         viewModel.observeMovieSearch().observe(this, listSearchResource -> {
             if (listSearchResource.status == SearchResource.SearchStatus.LOADING) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -133,8 +133,21 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_remove_search_requests:
+                viewModel.removeAllSearchRequests();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void navToDetailMovie() {
-        navController.navigate(R.id.action_mainFragment_to_detailFragment);
+        if(findViewById(R.id.detail_fragment) == null) {
+            // phone
+            navController.navigate(R.id.action_mainFragment_to_detailFragment);
+        }
     }
 
     @Override
@@ -163,7 +176,9 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            searchMenuItem.collapseActionView();
+            if (searchMenuItem != null) {
+                searchMenuItem.collapseActionView();
+            }
             searchMovies(query);
         }
     }
@@ -189,26 +204,24 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             searchMenuItem.expandActionView();
             searchMenuItem.getActionView().requestFocus();
         });
-
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            int destId = destination.getId();
-            switch (destId) {
-                case R.id.mainFragment:
-                    fab.show();
-                    appBarLayout.setExpanded(true);
-                    break;
-                case R.id.detailFragment:
-                    fab.hide();
-                    appBarLayout.setExpanded(true);
-                    break;
-            }
-        });
-        NavigationUI.setupWithNavController(toolbar, navController);
-    }
-
-    private void setupNavController() {
-
+        if(findViewById(R.id.detail_fragment) == null) {
+            // phone
+            navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                int destId = destination.getId();
+                switch (destId) {
+                    case R.id.mainFragment:
+                        fab.show();
+                        appBarLayout.setExpanded(true);
+                        break;
+                    case R.id.detailFragment:
+                        fab.hide();
+                        appBarLayout.setExpanded(true);
+                        break;
+                }
+            });
+            NavigationUI.setupWithNavController(toolbar, navController);
+        }
 
     }
 }

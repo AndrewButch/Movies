@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.domain.model;
+package com.andrewbutch.movies.data.pojo;
 // API response
 //{
 //        Title: "Star Wars: Episode IV - A New Hope",

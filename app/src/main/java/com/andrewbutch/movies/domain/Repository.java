@@ -2,8 +2,8 @@ package com.andrewbutch.movies.domain;
 
 import androidx.lifecycle.LiveData;
 
-import com.andrewbutch.movies.domain.model.Movie;
-import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.List;
@@ -26,4 +26,5 @@ public interface Repository {
     void setDetailMovieId(String movieId);
 
     LiveData<SearchResource<Movie>> getDetailMovie();
+    void removeAllSearchRequests();
 }

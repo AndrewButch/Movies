@@ -1,8 +1,8 @@
 package com.andrewbutch.movies.data;
 
-import com.andrewbutch.movies.domain.model.Movie;
-import com.andrewbutch.movies.domain.model.MoviePreview;
-import com.andrewbutch.movies.domain.model.Search;
+import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.pojo.MoviePreview;
+import com.andrewbutch.movies.data.pojo.Search;
 import com.andrewbutch.movies.utils.Constatnts;
 
 import java.util.ArrayList;

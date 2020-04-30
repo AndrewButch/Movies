@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.domain.model;
+package com.andrewbutch.movies.data.pojo;
 
 import com.google.gson.annotations.SerializedName;
 

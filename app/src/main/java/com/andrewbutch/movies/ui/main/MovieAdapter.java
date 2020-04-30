@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.domain.model.MoviePreview;
+import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

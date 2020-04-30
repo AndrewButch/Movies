@@ -3,9 +3,9 @@ package com.andrewbutch.movies.ui.main.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.domain.MoviesUseCase;
-import com.andrewbutch.movies.domain.model.Movie;
-import com.andrewbutch.movies.domain.model.MoviePreview;
 import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.List;
@@ -34,5 +34,9 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<SearchResource<Movie>> observeDetailMovie() {
         return useCase.getDetailMovie();
+    }
+
+    public void removeAllSearchRequests() {
+        useCase.removeAllSearchRequests();
     }
 }

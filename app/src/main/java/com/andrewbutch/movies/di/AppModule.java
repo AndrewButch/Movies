@@ -1,5 +1,7 @@
 package com.andrewbutch.movies.di;
 
+import android.app.Application;
+
 import com.andrewbutch.movies.data.MovieLoader;
 import com.andrewbutch.movies.data.MoviesAPI;
 import com.andrewbutch.movies.data.MoviesRepository;
@@ -32,8 +34,8 @@ abstract class AppModule {
 
     @Singleton
     @Provides
-    static Repository provideRepository(MovieLoader loader) {
-        return new MoviesRepository(loader);
+    static Repository provideRepository(MovieLoader loader, Application application) {
+        return new MoviesRepository(loader, application);
     }
 
 

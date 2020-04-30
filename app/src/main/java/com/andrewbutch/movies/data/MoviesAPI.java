@@ -1,7 +1,7 @@
 package com.andrewbutch.movies.data;
 
-import com.andrewbutch.movies.domain.model.Movie;
-import com.andrewbutch.movies.domain.model.Search;
+import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.pojo.Search;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

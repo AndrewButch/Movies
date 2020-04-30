@@ -8,4 +8,11 @@
         android:icon="@drawable/ic_search_black_24dp"
         app:showAsAction="ifRoom|collapseActionView">
     </item>
+
+    <item
+        android:id="@+id/menu_remove_search_requests"
+        android:title="Удалить историю поиска"
+        app:showAsAction="never">
+
+    </item>
 </menu>

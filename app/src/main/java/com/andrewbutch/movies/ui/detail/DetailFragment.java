@@ -3,20 +3,16 @@ package com.andrewbutch.movies.ui.detail;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.domain.model.Movie;
+import com.andrewbutch.movies.data.pojo.Movie;
 import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 import com.squareup.picasso.Picasso;
@@ -74,7 +70,9 @@ public class DetailFragment extends DaggerFragment {
                 case COMPLETE:
                     DetailFragment.this.view.hideProgress();
                     Movie movie = movieSearchResource.data;
-
+                    if (movie == null) {
+                        break;
+                    }
                     title.setText(movie.getTitle());
                     year.setText(movie.getYear());
                     duration.setText(movie.getDuration());
@@ -93,22 +91,22 @@ public class DetailFragment extends DaggerFragment {
         });
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.detail_fragment_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemID = item.getItemId();
-        switch (itemID) {
-            case R.id.menu_fragment_hello:
-                Toast.makeText(getContext(), "Hello", Toast.LENGTH_SHORT).show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        menu.clear();
+//        inflater.inflate(R.menu.detail_fragment_menu, menu);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        int itemID = item.getItemId();
+//        switch (itemID) {
+//            case R.id.menu_fragment_hello:
+//                Toast.makeText(getContext(), "Hello", Toast.LENGTH_SHORT).show();
+//                return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
 }
