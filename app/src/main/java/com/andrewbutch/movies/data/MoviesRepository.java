@@ -4,7 +4,6 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.andrewbutch.movies.data.database.SearchRequestDatabase;
 import com.andrewbutch.movies.data.database.dao.SearchRequestDao;
@@ -29,8 +28,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MoviesRepository implements Repository {
     private static final String TAG = "MoviesRepository";
     private MovieLoader loader;
-    private MutableLiveData<SearchResource<List<MoviePreview>>> moviesPreviewLiveData;
-    private MutableLiveData<SearchResource<Movie>> detailMovieLiveData;
+//    private MutableLiveData<SearchResource<List<MoviePreview>>> moviesPreviewLiveData;
+//    private MutableLiveData<SearchResource<Movie>> detailMovieLiveData;
     private String detailMovieId;
 
     private SearchRequestDatabase searchRequestDatabase;
@@ -39,13 +38,13 @@ public class MoviesRepository implements Repository {
     @Inject
     public MoviesRepository(MovieLoader loader, Application application) {
         this.loader = loader;
-        moviesPreviewLiveData = new MutableLiveData<>();
-        SearchResource<List<MoviePreview>> resource = SearchResource.complete(null);
-        moviesPreviewLiveData.setValue(resource);
-
-        detailMovieLiveData = new MutableLiveData<>();
-        SearchResource<Movie> detailResource = SearchResource.complete(null);
-        detailMovieLiveData.setValue(detailResource);
+//        moviesPreviewLiveData = new MutableLiveData<>();
+//        SearchResource<List<MoviePreview>> resource = SearchResource.complete(null);
+//        moviesPreviewLiveData.setValue(resource);
+//
+//        detailMovieLiveData = new MutableLiveData<>();
+//        SearchResource<Movie> detailResource = SearchResource.complete(null);
+//        detailMovieLiveData.setValue(detailResource);
 
         // Database
         searchRequestDatabase = SearchRequestDatabase.getInstance(application);
@@ -54,11 +53,13 @@ public class MoviesRepository implements Repository {
     }
 
     @Override
-    public void searchMovie(String search) {
-        loadMoviesBySearch(search);
-        SearchResource<List<MoviePreview>> resource = SearchResource.loading(null);
-        moviesPreviewLiveData.setValue(resource);
-//        searchRequestDao.insert(new SearchRequest(search, 1));
+    public void searchMovie(String searchRequest) {
+        loadMoviesBySearch(searchRequest);
+//        SearchResource<List<MoviePreview>> resource = SearchResource.loading(null);
+//        moviesPreviewLiveData.setValue(resource);
+
+//        searchRequestDao.insert(new SearchRequest(searchRequest, 1));
+
         Observable<SearchRequest> observable = Observable.create((ObservableOnSubscribe<SearchRequest>) emitter -> {
             if (!emitter.isDisposed()) {
                 List<SearchRequest> requests = searchRequestDao.selectAllByTime();
@@ -94,6 +95,7 @@ public class MoviesRepository implements Repository {
 
             }
         });
+
     }
 
     @Override
@@ -110,51 +112,38 @@ public class MoviesRepository implements Repository {
     }
 
     @Override
-    public LiveData<SearchResource<List<MoviePreview>>> getMovieSearch() {
-        return moviesPreviewLiveData;
+    public LiveData<SearchResource<List<MoviePreview>>> getSearchResult() {
+        return loader.getMovies();
     }
 
     @Override
-    public void setDetailMovieId(String movieId) {
+    public void setCurrentMovieId(String movieId) {
         this.detailMovieId = movieId;
         loadMovieDetail(movieId);
-        SearchResource<Movie> detailResource = SearchResource.loading(null);
-        detailMovieLiveData.setValue(detailResource);
+//        SearchResource<Movie> detailResource = SearchResource.loading(null);
+//        detailMovieLiveData.setValue(detailResource);
     }
 
     @Override
-    public LiveData<SearchResource<Movie>> getDetailMovie() {
-        return detailMovieLiveData;
+    public LiveData<SearchResource<Movie>> getCurrentMovie() {
+        return loader.getMovie();
+    }
+
+    @Override
+    public void addToFavorite() {
+
+    }
+
+    @Override
+    public LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies() {
+        return null;
     }
 
     private void loadMoviesBySearch(String search) {
-        loader.loadMovies(search, new MovieLoader.OnCompleteListener() {
-            @Override
-            public void onLoadComplete() {
-                SearchResource<List<MoviePreview>> resource = SearchResource.complete(loader.getMovies());
-                moviesPreviewLiveData.setValue(resource);
-            }
-
-            @Override
-            public void onLoadFailure() {
-
-            }
-        });
+        loader.loadMovies(search);
     }
 
     private void loadMovieDetail(String movieId) {
-        loader.loadMovieById(movieId, new MovieLoader.OnCompleteListener() {
-
-            @Override
-            public void onLoadComplete() {
-                SearchResource<Movie> resource = SearchResource.complete(loader.getMovie());
-                detailMovieLiveData.setValue(resource);
-            }
-
-            @Override
-            public void onLoadFailure() {
-
-            }
-        });
+        loader.loadMovieById(movieId);
     }
 }

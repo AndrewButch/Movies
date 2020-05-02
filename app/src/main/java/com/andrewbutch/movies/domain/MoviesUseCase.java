@@ -23,16 +23,16 @@ public class MoviesUseCase {
     }
 
     public LiveData<SearchResource<List<MoviePreview>>> getMovieSearch() {
-        return repository.getMovieSearch();
+        return repository.getSearchResult();
     }
 
     public void setDetailMovie(String movieID) {
-        repository.setDetailMovieId(movieID);
+        repository.setCurrentMovieId(movieID);
     }
 
 
     public LiveData<SearchResource<Movie>> getDetailMovie() {
-        return repository.getDetailMovie();
+        return repository.getCurrentMovie();
     }
 
     public void removeAllSearchRequests() {

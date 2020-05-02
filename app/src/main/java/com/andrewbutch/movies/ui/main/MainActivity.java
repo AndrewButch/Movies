@@ -45,6 +45,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     private NavController navController;
     private AppBarLayout appBarLayout;
 
+    private boolean isTablet;
+
     @Inject
     NetworkStatusWatcher networkStatusWatcher;
     @Inject
@@ -60,6 +62,9 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        isTablet = getResources().getBoolean(R.bool.isTablet);
+
         handleIntent(getIntent());
         initViews();
 
@@ -144,7 +149,12 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
 
     @Override
     public void navToDetailMovie() {
-        if(findViewById(R.id.detail_fragment) == null) {
+        if (isTablet) {
+            // tablet
+            NavController detailNavController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
+            detailNavController.navigate(R.id.detailFragment);
+
+        } else {
             // phone
             navController.navigate(R.id.action_mainFragment_to_detailFragment);
         }
@@ -201,10 +211,10 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
         fab = findViewById(R.id.fab);
         // fab activates search
         fab.setOnClickListener(v -> {
+
             searchMenuItem.expandActionView();
             searchMenuItem.getActionView().requestFocus();
         });
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
         if(!isTablet) {
             // phone
             navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -223,6 +233,9 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             });
             NavigationUI.setupWithNavController(toolbar, navController);
         }
-
+        else {
+            navController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
+            NavigationUI.setupWithNavController(toolbar, navController);
+        }
     }
 }

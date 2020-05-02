@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_fragment_hello"
-        android:icon="@drawable/ic_star_border_black_24dp"
+        android:id="@+id/menu_fragment_add_to_favorite"
+        android:icon="@drawable/ic_favorite_unchecked_24dp"
         android:title="Добавить в избранное"
         app:showAsAction="ifRoom"/>
 </menu>

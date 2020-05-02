@@ -9,22 +9,23 @@ import com.andrewbutch.movies.ui.main.SearchResource;
 import java.util.List;
 
 public interface Repository {
-//    List<MoviePreview> getLastSearchResult();
-//    void insertMovie(MoviePreview movie);
-//    void insertMovie(List<MoviePreview> movies);
-//
-//    Movie getMovieByID(String movieId);
-//    void addMovie(Movie movie);
-//
-//    List<String> getSearchRequests();
-//    void insertSearchRequest(String request);
 
-    void searchMovie(String search);
-    LiveData<SearchResource<List<MoviePreview>>> getMovieSearch();
+    /** Movie search */
+    void searchMovie(String searchRequest);
 
+    LiveData<SearchResource<List<MoviePreview>>> getSearchResult();
 
-    void setDetailMovieId(String movieId);
-
-    LiveData<SearchResource<Movie>> getDetailMovie();
     void removeAllSearchRequests();
+
+
+    /** Current movie */
+    void setCurrentMovieId(String movieId);
+
+    LiveData<SearchResource<Movie>> getCurrentMovie();
+
+
+    /**  Favorite */
+    void addToFavorite();
+
+    LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies();
 }
