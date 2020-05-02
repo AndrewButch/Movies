@@ -204,7 +204,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             searchMenuItem.expandActionView();
             searchMenuItem.getActionView().requestFocus();
         });
-        if(findViewById(R.id.detail_fragment) == null) {
+        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+        if(!isTablet) {
             // phone
             navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
