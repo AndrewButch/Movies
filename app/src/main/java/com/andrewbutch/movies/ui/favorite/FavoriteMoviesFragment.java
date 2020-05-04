@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.data.pojo.Movie;
@@ -22,12 +23,12 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 
 public class FavoriteMoviesFragment extends DaggerFragment {
+    private RecyclerView recyclerView;
+    private FavoriteAdapter adapter;
     private MainView view;
 
     @Inject
     MainViewModel viewModel;
-
-    TextView favorite;
 
     @Override
     public void onAttach(Context context) {
@@ -45,7 +46,11 @@ public class FavoriteMoviesFragment extends DaggerFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        favorite = view.findViewById(R.id.favorite);
+        recyclerView = view.findViewById(R.id.favorites_recycler);
+        recyclerView.hasFixedSize();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new FavoriteAdapter(getContext());
+        recyclerView.setAdapter(adapter);
 
         viewModel.observeFavorites().observe(getViewLifecycleOwner(), favorites -> {
             switch (favorites.status) {
@@ -55,18 +60,10 @@ public class FavoriteMoviesFragment extends DaggerFragment {
                 case COMPLETE:
                     FavoriteMoviesFragment.this.view.hideProgress();
                     List<Movie> movies = favorites.data;
-                    if (movies == null) {
-                        break;
+                    if (movies != null) {
+                        adapter.setData(movies);
                     }
-                    StringBuilder builder = new StringBuilder();
-                    for (Movie movie : movies) {
-                        builder.append(movie.getTitle());
-                        builder.append("( ");
-                        builder.append(movie.getYear());
-                        builder.append(" )");
-                        builder.append("\n");
-                    }
-                    FavoriteMoviesFragment.this.favorite.setText(builder.toString());
+
                     break;
                 case ERROR:
                     FavoriteMoviesFragment.this.view.hideProgress();

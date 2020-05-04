@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.ui.main;
+package com.andrewbutch.movies.ui.searchmovie;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
+import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.ui.main;
+package com.andrewbutch.movies.ui.searchmovie;
 
 import android.content.Context;
 import android.view.LayoutInflater;

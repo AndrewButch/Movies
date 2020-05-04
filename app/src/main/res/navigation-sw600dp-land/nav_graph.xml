@@ -12,7 +12,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.andrewbutch.movies.ui.main.MainFragment"
+        android:name="com.andrewbutch.movies.ui.searchmovie.MainFragment"
         android:label="Movie"
         tools:layout="@layout/fragment_main">
     </fragment>

@@ -2,7 +2,7 @@ package com.andrewbutch.movies.di.main;
 
 import com.andrewbutch.movies.ui.detail.DetailFragment;
 import com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment;
-import com.andrewbutch.movies.ui.main.MainFragment;
+import com.andrewbutch.movies.ui.searchmovie.MainFragment;
 import com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment;
 
 import dagger.Module;

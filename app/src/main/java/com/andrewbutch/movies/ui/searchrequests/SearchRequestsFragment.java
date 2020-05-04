@@ -5,10 +5,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
@@ -23,11 +24,12 @@ import dagger.android.support.DaggerFragment;
 
 public class SearchRequestsFragment extends DaggerFragment {
     private MainView view;
+    private RecyclerView recyclerView;
+    private SearchAdapter adapter;
 
     @Inject
     MainViewModel viewModel;
 
-    TextView searchRequests;
 
     @Override
     public void onAttach(Context context) {
@@ -45,7 +47,11 @@ public class SearchRequestsFragment extends DaggerFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        searchRequests = view.findViewById(R.id.search_requests);
+        recyclerView = view.findViewById(R.id.search_request_recycler);
+        recyclerView.hasFixedSize();
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new SearchAdapter(getContext());
+        recyclerView.setAdapter(adapter);
 
         viewModel.observeSearchRequests().observe(getViewLifecycleOwner(), searchRequests -> {
             switch (searchRequests.status) {
@@ -55,15 +61,9 @@ public class SearchRequestsFragment extends DaggerFragment {
                 case COMPLETE:
                     SearchRequestsFragment.this.view.hideProgress();
                     List<SearchRequest> requests = searchRequests.data;
-                    if (requests == null) {
-                        break;
+                    if (requests != null) {
+                        adapter.setData(requests);
                     }
-                    StringBuilder builder = new StringBuilder();
-                    for (SearchRequest request : requests) {
-                        builder.append(request.getRequest());
-                        builder.append("\n");
-                    }
-                    SearchRequestsFragment.this.searchRequests.setText(builder.toString());
                     break;
                 case ERROR:
                     SearchRequestsFragment.this.view.hideProgress();

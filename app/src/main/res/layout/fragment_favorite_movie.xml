@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/favorite"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favorites_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="75dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        tools:listitem="@android:layout/simple_list_item_1"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+</FrameLayout>
