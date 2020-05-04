@@ -66,7 +66,7 @@ public class DetailFragment extends DaggerFragment {
         rating = view.findViewById(R.id.rating_tv);
         duration = view.findViewById(R.id.duration_tv);
 
-        viewModel.observeDetailMovie().observe(getViewLifecycleOwner(), movieSearchResource -> {
+        viewModel.observeCurrentMovie().observe(getViewLifecycleOwner(), movieSearchResource -> {
             switch (movieSearchResource.status) {
                 case LOADING:
                     DetailFragment.this.view.showProgress();
@@ -110,6 +110,7 @@ public class DetailFragment extends DaggerFragment {
         int itemID = item.getItemId();
         switch (itemID) {
             case R.id.menu_fragment_add_to_favorite:
+                viewModel.addToFavorite();
                 Toast.makeText(getContext(), "Add to favorite", Toast.LENGTH_SHORT).show();
                 return true;
         }

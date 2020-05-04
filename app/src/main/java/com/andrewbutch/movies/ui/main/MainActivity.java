@@ -143,6 +143,12 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             case R.id.menu_remove_search_requests:
                 viewModel.removeAllSearchRequests();
                 return true;
+            case R.id.menu_show_search_requests:
+                navToSearchRequests();
+                return true;
+            case R.id.menu_show_favorite:
+                navToFavorite();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -151,12 +157,32 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public void navToDetailMovie() {
         if (isTablet) {
             // tablet
-            NavController detailNavController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
-            detailNavController.navigate(R.id.detailFragment);
-
+            navController.navigate(R.id.detailFragment);
         } else {
             // phone
             navController.navigate(R.id.action_mainFragment_to_detailFragment);
+        }
+    }
+
+    public void navToSearchRequests() {
+        if (isTablet) {
+            // tablet
+            navController.navigate(R.id.searchRequestsFragment);
+
+        } else {
+            // phone
+            navController.navigate(R.id.action_mainFragment_to_searchRequestsFragment);
+        }
+    }
+
+    public void navToFavorite() {
+        if (isTablet) {
+            // tablet
+            navController.navigate(R.id.favoriteMoviesFragment);
+
+        } else {
+            // phone
+            navController.navigate(R.id.action_mainFragment_to_favoriteMoviesFragment);
         }
     }
 
@@ -232,10 +258,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
                 }
             });
             NavigationUI.setupWithNavController(toolbar, navController);
-        }
-        else {
+        } else {
             navController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
-            NavigationUI.setupWithNavController(toolbar, navController);
         }
     }
 }

@@ -7,12 +7,20 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:icon="@drawable/ic_search_24dp"
         app:showAsAction="ifRoom|collapseActionView">
-</item>
-
+    </item>
     <item
         android:id="@+id/menu_remove_search_requests"
         android:title="Удалить историю поиска"
         app:showAsAction="never">
-
+    </item>
+    <item
+        android:id="@+id/menu_show_search_requests"
+        android:title="Список запросов"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/menu_show_favorite"
+        android:title="Избранное"
+        app:showAsAction="never">
     </item>
 </menu>

@@ -85,7 +85,7 @@ public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHol
 
     @Override
     public void onClick(String movieID) {
-        viewModel.setDetailMovieID(movieID);
+        viewModel.setCurrentMovieID(movieID);
         view.navToDetailMovie();
     }
 

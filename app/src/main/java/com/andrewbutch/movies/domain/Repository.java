@@ -2,6 +2,7 @@ package com.andrewbutch.movies.domain;
 
 import androidx.lifecycle.LiveData;
 
+import com.andrewbutch.movies.data.database.entity.SearchRequest;
 import com.andrewbutch.movies.data.pojo.Movie;
 import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.ui.main.SearchResource;
@@ -15,6 +16,7 @@ public interface Repository {
 
     LiveData<SearchResource<List<MoviePreview>>> getSearchResult();
 
+    LiveData<SearchResource<List<SearchRequest>>> getAllSearchRequests();
     void removeAllSearchRequests();
 
 
@@ -27,5 +29,5 @@ public interface Repository {
     /**  Favorite */
     void addToFavorite();
 
-    LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies();
+    LiveData<SearchResource<List<Movie>>> getFavoriteMovies();
 }

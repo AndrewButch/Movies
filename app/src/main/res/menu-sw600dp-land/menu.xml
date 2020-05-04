@@ -8,7 +8,6 @@
         android:icon="@drawable/ic_search_24dp"
         app:showAsAction="ifRoom|collapseActionView">
     </item>
-
     <item
         android:id="@+id/menu_remove_search_requests"
         android:title="Удалить историю поиска"
@@ -19,4 +18,14 @@
         android:icon="@drawable/ic_favorite_checked_24dp"
         android:title="Добавить в избранное"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_show_search_requests"
+        android:title="Список запросов"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/menu_show_favorite"
+        android:title="Избранное"
+        app:showAsAction="never">
+    </item>
 </menu>

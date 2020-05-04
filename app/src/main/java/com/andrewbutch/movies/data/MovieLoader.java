@@ -1,5 +1,6 @@
 package com.andrewbutch.movies.data;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -103,10 +104,12 @@ public class MovieLoader {
         });
     }
 
+    @NonNull
     public LiveData<SearchResource<List<MoviePreview>>> getMovies() {
         return searchResult;
     }
 
+    @NonNull
     public LiveData<SearchResource<Movie>> getMovie() {
         return movieLoadingResult;
     }

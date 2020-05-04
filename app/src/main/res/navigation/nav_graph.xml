@@ -17,15 +17,33 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
-
+        <action
+            android:id="@+id/action_mainFragment_to_searchRequestsFragment"
+            app:destination="@id/searchRequestsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_mainFragment_to_favoriteMoviesFragment"
+            app:destination="@id/favoriteMoviesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.andrewbutch.movies.ui.detail.DetailFragment"
-        tools:layout="@layout/fragment_detail">
-        <action
-            android:id="@+id/action_detailFragment_to_mainFragment"
-            app:destination="@id/mainFragment"
-            app:launchSingleTop="false" />
-    </fragment>
+        tools:layout="@layout/fragment_detail"/>
+    <fragment
+        android:id="@+id/searchRequestsFragment"
+        android:name="com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment"
+        android:label="SearchRequestsFragment"
+        tools:layout="@layout/fragment_search_requests"/>
+    <fragment
+        android:id="@+id/favoriteMoviesFragment"
+        android:name="com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment"
+        android:label="FavoriteMoviesFragment"
+        tools:layout="@layout/fragment_favorite_movie"/>
 </navigation>

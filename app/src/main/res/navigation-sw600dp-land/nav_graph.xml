@@ -16,4 +16,14 @@
         android:label="Movie"
         tools:layout="@layout/fragment_main">
     </fragment>
+    <fragment
+        android:id="@+id/searchRequestsFragment"
+        android:name="com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment"
+        android:label="SearchRequestsFragment"
+        tools:layout="@layout/fragment_search_requests"/>
+    <fragment
+        android:id="@+id/favoriteMoviesFragment"
+        android:name="com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment"
+        android:label="FavoriteMoviesFragment"
+        tools:layout="@layout/fragment_favorite_movie"/>
 </navigation>
