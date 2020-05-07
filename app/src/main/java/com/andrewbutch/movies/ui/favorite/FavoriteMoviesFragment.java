@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 
@@ -59,7 +59,7 @@ public class FavoriteMoviesFragment extends DaggerFragment {
                     break;
                 case COMPLETE:
                     FavoriteMoviesFragment.this.view.hideProgress();
-                    List<Movie> movies = favorites.data;
+                    List<MoviePreview> movies = favorites.data;
                     if (movies != null) {
                         adapter.setData(movies);
                     }

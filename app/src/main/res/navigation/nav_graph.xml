@@ -3,46 +3,46 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/main_dest">
 
     <fragment
-        android:id="@+id/mainFragment"
+        android:id="@+id/main_dest"
         android:name="com.andrewbutch.movies.ui.searchmovie.MainFragment"
         android:label="Movie"
         tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_detailFragment"
-            app:destination="@id/detailFragment"
+            app:destination="@id/detail_dest"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_mainFragment_to_searchRequestsFragment"
-            app:destination="@id/searchRequestsFragment"
+            app:destination="@id/search_requests_dest"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
         <action
             android:id="@+id/action_mainFragment_to_favoriteMoviesFragment"
-            app:destination="@id/favoriteMoviesFragment"
+            app:destination="@id/favorite_movies_dest"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
-        android:id="@+id/detailFragment"
+        android:id="@+id/detail_dest"
         android:name="com.andrewbutch.movies.ui.detail.DetailFragment"
         tools:layout="@layout/fragment_detail"/>
     <fragment
-        android:id="@+id/searchRequestsFragment"
+        android:id="@+id/search_requests_dest"
         android:name="com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment"
         android:label="SearchRequestsFragment"
         tools:layout="@layout/fragment_search_requests"/>
     <fragment
-        android:id="@+id/favoriteMoviesFragment"
+        android:id="@+id/favorite_movies_dest"
         android:name="com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment"
         android:label="FavoriteMoviesFragment"
         tools:layout="@layout/fragment_favorite_movie"/>

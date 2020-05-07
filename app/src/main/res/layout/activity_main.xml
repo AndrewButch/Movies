@@ -9,8 +9,7 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Light"
-    >
+        android:theme="@style/ThemeOverlay.MaterialComponents.Light">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             style="@style/Widget.MaterialComponents.Light.ActionBar.Solid"
@@ -23,16 +22,24 @@
 
     <include layout="@layout/content_main"/>
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="?android:attr/windowBackground"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         app:fabSize="normal"
-        app:layout_anchor="@id/nav_host_fragment"
-        app:layout_anchorGravity="bottom|right|end"
-        android:clickable="true"
+        app:elevation="16dp"
         app:srcCompat="@drawable/ic_search_24dp"
         app:layout_behavior=".ui.coordinatorbehavior.FabHideBehaviour"/>
 

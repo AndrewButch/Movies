@@ -29,5 +29,5 @@ public interface Repository {
     /**  Favorite */
     void addToFavorite();
 
-    LiveData<SearchResource<List<Movie>>> getFavoriteMovies();
+    LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies();
 }

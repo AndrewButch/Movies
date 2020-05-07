@@ -2,7 +2,6 @@ package com.andrewbutch.movies.ui.searchmovie;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +17,11 @@ import com.andrewbutch.movies.ui.NetworkStatusWatcher;
 import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Function;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHolderClickListener {
     private static final String TAG = "MainFragment";
@@ -88,44 +80,5 @@ public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHol
     public void onClick(String movieID) {
         viewModel.setCurrentMovieID(movieID);
         view.navToDetailMovie();
-    }
-
-    private void RxLoad() {
-        ArrayList<Integer> iterable = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            iterable.add(i);
-        }
-        Observable<String> observable = Observable.fromIterable(iterable)
-                .subscribeOn(Schedulers.io())
-                .map(new Function<Integer, String>() {
-                    @Override
-                    public String apply(Integer integer) throws Throwable {
-                        Thread.sleep(1000);
-                        Log.d(TAG, "apply: " + Thread.currentThread().getName() + " => " +  integer);
-                        return String.valueOf(integer);
-                    }
-                })
-                .observeOn(AndroidSchedulers.mainThread());
-        observable.subscribe(new Observer<String>() {
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull String string) {
-                        Log.d(TAG, "onNext: " + Thread.currentThread().getName() + " -> " + string);
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        Log.d(TAG, "onError: error");
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete: complete");
-                    }
-                });
     }
 }

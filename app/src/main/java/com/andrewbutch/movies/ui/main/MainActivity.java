@@ -28,6 +28,7 @@ import com.andrewbutch.movies.R;
 import com.andrewbutch.movies.ui.NetworkStatusWatcher;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     private ProgressBar progressBar;
     private NavController navController;
     private AppBarLayout appBarLayout;
+    private BottomNavigationView bottomNavigationView;
 
     private boolean isTablet;
 
@@ -76,6 +78,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
                 progressBar.setVisibility(View.GONE);
             }
         });
+
+
     }
 
     @Override
@@ -157,7 +161,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public void navToDetailMovie() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.detailFragment);
+            navController.navigate(R.id.detail_dest);
         } else {
             // phone
             navController.navigate(R.id.action_mainFragment_to_detailFragment);
@@ -167,7 +171,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public void navToSearchRequests() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.searchRequestsFragment);
+            navController.navigate(R.id.search_requests_dest);
 
         } else {
             // phone
@@ -178,7 +182,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public void navToFavorite() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.favoriteMoviesFragment);
+            navController.navigate(R.id.favorite_movies_dest);
 
         } else {
             // phone
@@ -237,29 +241,49 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
         fab = findViewById(R.id.fab);
         // fab activates search
         fab.setOnClickListener(v -> {
-
             searchMenuItem.expandActionView();
             searchMenuItem.getActionView().requestFocus();
         });
+        bottomNavigationView = findViewById(R.id.bottom_nav_view);
+
+
         if(!isTablet) {
             // phone
+            NavigationUI.setupWithNavController(bottomNavigationView,
+                    Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment));
+
             navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
                 int destId = destination.getId();
                 switch (destId) {
-                    case R.id.mainFragment:
+                    case R.id.main_dest:
                         fab.show();
+                        bottomNavigationView.setVisibility(View.VISIBLE);
                         appBarLayout.setExpanded(true);
                         break;
-                    case R.id.detailFragment:
+                    case R.id.detail_dest:
                         fab.hide();
+                        bottomNavigationView.setVisibility(View.GONE);
                         appBarLayout.setExpanded(true);
                         break;
                 }
             });
             NavigationUI.setupWithNavController(toolbar, navController);
         } else {
+            // tablet
             navController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
+            bottomNavigationView.setOnNavigationItemSelectedListener(
+                    item -> {
+                        switch (item.getItemId()) {
+                            case R.id.search_requests_dest:
+                                navToSearchRequests();
+                                return true;
+                            case R.id.favorite_movies_dest:
+                                navToFavorite();
+                                return true;
+                        }
+                        return false;
+                    });
         }
     }
 }

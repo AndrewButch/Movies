@@ -46,8 +46,8 @@ public class MoviesRepository implements Repository {
     private MutableLiveData<SearchResource<List<SearchRequest>>> searchRequestsLiveData;
     private SearchResource<List<SearchRequest>> searchRequestsResource;
 
-    private MutableLiveData<SearchResource<List<Movie>>> favoriteLiveData;
-    private SearchResource<List<Movie>> favoriteResource;
+    private MutableLiveData<SearchResource<List<MoviePreview>>> favoriteLiveData;
+    private SearchResource<List<MoviePreview>> favoriteResource;
 
 
     @Inject
@@ -196,7 +196,7 @@ public class MoviesRepository implements Repository {
     }
 
     @Override
-    public LiveData<SearchResource<List<Movie>>> getFavoriteMovies() {
+    public LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies() {
         Observable.fromCallable(() -> movieDao.getAllFavoriteMovies(true))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -208,7 +208,7 @@ public class MoviesRepository implements Repository {
 
                     @Override
                     public void onNext(List<com.andrewbutch.movies.data.database.entity.Movie> t) {
-                        List<Movie> movies = mapToPojo(t);
+                        List<MoviePreview> movies = mapToPojo(t);
                         favoriteResource = SearchResource.complete(movies);
                         favoriteLiveData.setValue(favoriteResource);
                     }
@@ -234,8 +234,8 @@ public class MoviesRepository implements Repository {
         loader.loadMovieById(movieId);
     }
 
-    private List<Movie> mapToPojo(List<com.andrewbutch.movies.data.database.entity.Movie> dbMovies) {
-        List<Movie> movies = new ArrayList<>();
+    private List<MoviePreview> mapToPojo(List<com.andrewbutch.movies.data.database.entity.Movie> dbMovies) {
+        List<MoviePreview> movies = new ArrayList<>();
         for (com.andrewbutch.movies.data.database.entity.Movie movie : dbMovies) {
             Movie pojoMovie = new Movie();
             pojoMovie.setPosterUrl(movie.getPosterUrl());

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/poster_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread" />
+
+        <LinearLayout
+            android:id="@+id/text_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/poster_image"
+            app:layout_constraintEnd_toStartOf="@+id/btn_uncheck_favorite"
+            app:layout_constraintStart_toEndOf="@+id/poster_image"
+            app:layout_constraintTop_toTopOf="@+id/poster_image"
+            >
+
+            <TextView
+                android:id="@+id/title_tv"
+                style="@style/DetailHeader"
+                tools:text="Title" />
+
+            <TextView
+                android:id="@+id/year_tv"
+                style="@style/DetailText"
+                tools:text="Year" />
+
+            <TextView
+                android:id="@+id/duration_tv"
+                style="@style/DetailText"
+                tools:text="180 min" />
+
+            <TextView
+                android:id="@+id/rating_tv"
+                style="@style/DetailText"
+                tools:text="IMDB: 3.6" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_uncheck_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:minWidth="100dp"
+            android:scaleType="centerCrop"
+            android:background="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/text_container"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/text_container"
+            app:layout_constraintTop_toTopOf="@+id/text_container"
+            android:src="@drawable/ic_favorite_checked_24dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

@@ -52,7 +52,7 @@ public class MainViewModel extends ViewModel {
     public void addToFavorite() {
         repository.addToFavorite();
     }
-    public LiveData<SearchResource<List<Movie>>> observeFavorites() {
+    public LiveData<SearchResource<List<MoviePreview>>> observeFavorites() {
         return repository.getFavoriteMovies();
     }
 }

@@ -3,26 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/detailFragment">
+    app:startDestination="@id/favorite_movies_dest">
     <fragment
-        android:id="@+id/detailFragment"
+        android:id="@+id/detail_dest"
         android:name="com.andrewbutch.movies.ui.detail.DetailFragment"
         tools:layout="@layout/fragment_detail">
     </fragment>
 
     <fragment
-        android:id="@+id/mainFragment"
+        android:id="@+id/main_dest"
         android:name="com.andrewbutch.movies.ui.searchmovie.MainFragment"
         android:label="Movie"
         tools:layout="@layout/fragment_main">
     </fragment>
     <fragment
-        android:id="@+id/searchRequestsFragment"
+        android:id="@+id/search_requests_dest"
         android:name="com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment"
         android:label="SearchRequestsFragment"
         tools:layout="@layout/fragment_search_requests"/>
     <fragment
-        android:id="@+id/favoriteMoviesFragment"
+        android:id="@+id/favorite_movies_dest"
         android:name="com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment"
         android:label="FavoriteMoviesFragment"
         tools:layout="@layout/fragment_favorite_movie"/>

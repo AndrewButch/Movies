@@ -18,10 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:minHeight="?attr/actionBarSize"
-            app:layout_scrollFlags="scroll|enterAlways|snap" />
+            app:layout_scrollFlags="enterAlways" />
     </com.google.android.material.appbar.AppBarLayout>
-
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_main"
@@ -35,21 +33,32 @@
             android:name="com.andrewbutch.movies.ui.searchmovie.MainFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_nav_view"
             app:layout_constraintEnd_toStartOf="@id/nav_host_fragment_detail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <fragment
             android:id="@+id/nav_host_fragment_detail"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_nav_view"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/main_fragment"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/nav_graph" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?android:attr/windowBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            app:navGraph="@navigation/nav_graph"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:menu="@menu/bottom_nav_menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -60,8 +69,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         app:fabSize="normal"
-        app:layout_anchor="@id/container_main"
-        app:layout_anchorGravity="bottom|right|end"
+        app:layout_anchor="@id/bottom_nav_view"
+        app:layout_anchorGravity="top|right|end"
         android:clickable="true"
         app:srcCompat="@drawable/ic_search_24dp"
         app:layout_behavior=".ui.coordinatorbehavior.FabHideBehaviour"/>
