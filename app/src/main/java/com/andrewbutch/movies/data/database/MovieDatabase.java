@@ -15,6 +15,7 @@ import com.andrewbutch.movies.data.database.entity.MovieEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+// Database of favorite movies
 @Database(entities = {MovieEntity.class}, version = 1, exportSchema = false)
 public abstract class MovieDatabase extends RoomDatabase {
 

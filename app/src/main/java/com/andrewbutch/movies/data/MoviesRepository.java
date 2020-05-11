@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.andrewbutch.movies.data.database.MovieDatabase;
 import com.andrewbutch.movies.data.database.SearchRequestDatabase;
@@ -19,20 +18,17 @@ import com.andrewbutch.movies.domain.Repository;
 import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.core.Single;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MoviesRepository implements Repository {
@@ -84,32 +80,25 @@ public class MoviesRepository implements Repository {
     }
 
     private void init() {
-        Observable.fromCallable(new Callable<List<MovieEntity>>() {
-            @Override
-            public List<MovieEntity> call() throws Exception {
-                return movieDao.getAllFavoriteMovies(true);
-            }
-        })
+        // get all favorite movies and cache to HashMap
+        Single.fromCallable(() -> movieDao.getAllFavoriteMovies(true))
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<List<MovieEntity>>() {
-                    @Override
-                    public void accept(List<MovieEntity> movieEntities) throws Throwable {
-                        favoriteMovies = new HashMap<>();
-                        for (MovieEntity entity : movieEntities) {
-                            favoriteMovies.put(entity.getId(), entity);
-                        }
+                .subscribe(movieEntities -> {
+                    favoriteMovies = new HashMap<>();
+                    for (MovieEntity entity : movieEntities) {
+                        favoriteMovies.put(entity.getId(), entity);
                     }
                 });
     }
 
     @Override
     public void searchMovie(String searchRequest) {
-        loadMoviesBySearch(searchRequest);
-        Completable.fromRunnable(() -> {
+        loader.loadMovies(searchRequest);
+        Completable.fromCallable(() -> {
             searchRequestDao.insert(new SearchRequest(searchRequest,
                     GregorianCalendar.getInstance().getTimeInMillis()));
             Log.d(TAG, "Search movie: " + Thread.currentThread().getName() + " " + searchRequest);
-
+            return null;
         })
                 .subscribeOn(Schedulers.io())
                 .subscribe(() -> {
@@ -119,15 +108,17 @@ public class MoviesRepository implements Repository {
 
     @Override
     public void removeAllSearchRequests() {
-        Observable.create(emitter -> {
-            if (!emitter.isDisposed()) {
-                Log.d(TAG, "removeAllSearchRequests: " + Thread.currentThread().getName());
-                searchRequestDao.removeAll();
-                emitter.onComplete();
-            }
+        Completable.fromCallable(() -> {
+            Log.d(TAG, "removeAllSearchRequests: " + Thread.currentThread().getName());
+            searchRequestDao.removeAll();
+            return null;
         })
                 .subscribeOn(Schedulers.io())
-                .subscribe();
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    searchRequestsResource = SearchResource.complete(Collections.emptyList());
+                    searchRequestsLiveData.setValue(searchRequestsResource);
+                });
     }
 
     @Override
@@ -137,10 +128,7 @@ public class MoviesRepository implements Repository {
 
     @Override
     public LiveData<SearchResource<List<SearchRequest>>> getAllSearchRequests() {
-        Observable.create((ObservableOnSubscribe<List<SearchRequest>>) emitter -> {
-            emitter.onNext(searchRequestDao.selectAllByTime());
-            emitter.onComplete();
-        })
+        Single.fromCallable(() -> searchRequestDao.selectAllByTime())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(searchRequests -> {
@@ -155,34 +143,31 @@ public class MoviesRepository implements Repository {
 
     @Override
     public void setCurrentMovieId(String movieId) {
-        loadMovieDetail(movieId);
+        loader.loadMovieById(movieId);
     }
 
     @Override
     public LiveData<SearchResource<MovieEntity>> getCurrentMovie() {
-        loader.getMovie().observeForever(new Observer<SearchResource<Movie>>() {
-            @Override
-            public void onChanged(SearchResource<Movie> movieSearchResource) {
-                switch(movieSearchResource.status) {
-                    case LOADING:
-                        currentMovieResource = SearchResource.loading(null);
-                        currentMovie.setValue(currentMovieResource);
-                    case COMPLETE:
-                        if (movieSearchResource.data != null) {
-                            Movie pojo = movieSearchResource.data;
-                            MovieEntity movieEntity = mapMoviePojoToEntity(pojo);
-                            String movieId = movieEntity.getId();
-                            MovieEntity favoriteMovie = favoriteMovies.get(movieId);
-                            if (favoriteMovie != null) {
-                                movieEntity.setFavorite(favoriteMovie.isFavorite());
-                            }
-                            currentMovieResource = SearchResource.complete(movieEntity);
-                            currentMovie.setValue(currentMovieResource);
+        loader.getMovie().observeForever(movieSearchResource -> {
+            switch (movieSearchResource.status) {
+                case LOADING:
+                    currentMovieResource = SearchResource.loading(null);
+                    currentMovie.setValue(currentMovieResource);
+                case COMPLETE:
+                    if (movieSearchResource.data != null) {
+                        Movie pojo = movieSearchResource.data;
+                        MovieEntity movieEntity = mapMoviePojoToEntity(pojo);
+                        String movieId = movieEntity.getId();
+                        MovieEntity favoriteMovie = favoriteMovies.get(movieId);
+                        if (favoriteMovie != null) {
+                            movieEntity.setFavorite(favoriteMovie.isFavorite());
                         }
-                    case ERROR:
-                        currentMovieResource = SearchResource.error("Ошибка при загрузке current movie");
+                        currentMovieResource = SearchResource.complete(movieEntity);
                         currentMovie.setValue(currentMovieResource);
-                }
+                    }
+                case ERROR:
+                    currentMovieResource = SearchResource.error("Ошибка при загрузке current movie");
+                    currentMovie.setValue(currentMovieResource);
             }
         });
         return currentMovie;
@@ -193,6 +178,7 @@ public class MoviesRepository implements Repository {
         if (getCurrentMovie() != null) {
             final Movie movie = loader.getMovie().getValue().data;
             if (movie != null) {
+                // Create DB entity
                 Single.fromCallable(() -> {
                     String id = movie.getId();
                     String posterUrl = movie.getPosterUrl();
@@ -202,6 +188,7 @@ public class MoviesRepository implements Repository {
                     String rating = movie.getRating();
                     MovieEntity movieEntity =
                             new MovieEntity(id, posterUrl, title, year, durationg, rating, true);
+                    // insert entity into DB
                     movieDao.insert(movieEntity);
                     favoriteMovies.put(id, movieEntity);
                     return movieEntity;
@@ -209,7 +196,7 @@ public class MoviesRepository implements Repository {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(movieEntity -> {
-                            // update live data
+                            // update live data with entity
                             currentMovieResource = SearchResource.complete(movieEntity);
                             currentMovie.setValue(currentMovieResource);
                         });
@@ -220,7 +207,7 @@ public class MoviesRepository implements Repository {
     @Override
     public void removeFromFavorite(final String movieId) {
         if (!movieId.isEmpty()) {
-            // remove movie by id
+            // remove movie by id from favorite DB
             Single.fromCallable(() -> {
                 movieDao.delete(movieId);
                 List<MovieEntity> favoriteMovies = movieDao.getAllFavoriteMovies(true);
@@ -246,23 +233,15 @@ public class MoviesRepository implements Repository {
 
     @Override
     public LiveData<SearchResource<List<MoviePreview>>> getFavoriteMovies() {
-        Observable.fromCallable(() -> movieDao.getAllFavoriteMovies(true))
+        Single.fromCallable(() -> movieDao.getAllFavoriteMovies(true))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(t -> {
-                    List<MoviePreview> movies = mapMovieListEntityToPojo(t);
+                .subscribe(entities -> {
+                    List<MoviePreview> movies = mapMovieListEntityToPojo(entities);
                     favoriteResource = SearchResource.complete(movies);
                     favoriteLiveData.setValue(favoriteResource);
                 });
         return favoriteLiveData;
-    }
-
-    private void loadMoviesBySearch(String search) {
-        loader.loadMovies(search);
-    }
-
-    private void loadMovieDetail(String movieId) {
-        loader.loadMovieById(movieId);
     }
 
     private List<MoviePreview> mapMovieListEntityToPojo(List<MovieEntity> dbMovies) {

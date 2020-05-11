@@ -54,7 +54,6 @@ public class MovieLoader {
         searchResult.setValue(searchResource);
 
         Call<Search> callMovies =  moviesAPI.getSearchMovies(search, Constatnts.API_KEY);
-        Request req = callMovies.request();
         callMovies.enqueue(new Callback<Search>() {
             @Override
             public void onResponse(Call<Search> call, Response<Search> response) {

@@ -12,6 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.andrewbutch.movies.data.database.dao.SearchRequestDao;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
 
+// Database of search history
 @Database(entities = {SearchRequest.class}, exportSchema = false, version = 1)
 public abstract class SearchRequestDatabase extends RoomDatabase {
     private static SearchRequestDatabase instance;
@@ -32,11 +33,12 @@ public abstract class SearchRequestDatabase extends RoomDatabase {
 
     private static RoomDatabase.Callback callback = new RoomDatabase.Callback() {
         @Override
-        public void onOpen(@NonNull SupportSQLiteDatabase db) {
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
             new PopulateDbAsyncTask(instance).execute();
         }
     };
+
 
     private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void> {
 
