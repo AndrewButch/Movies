@@ -9,20 +9,20 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.andrewbutch.movies.data.database.dao.SearchRequestDao;
+import com.andrewbutch.movies.data.database.dao.SearchHistoryDao;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
 
 // Database of search history
 @Database(entities = {SearchRequest.class}, exportSchema = false, version = 1)
-public abstract class SearchRequestDatabase extends RoomDatabase {
-    private static SearchRequestDatabase instance;
+public abstract class SearchHistoryDatabase extends RoomDatabase {
+    private static SearchHistoryDatabase instance;
 
-    public abstract SearchRequestDao dao();
+    public abstract SearchHistoryDao dao();
 
-    public static SearchRequestDatabase getInstance(Context context) {
+    public static SearchHistoryDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(context,
-                    SearchRequestDatabase.class, "search_request_database")
+                    SearchHistoryDatabase.class, "search_request_database")
                     .fallbackToDestructiveMigration()
                     .addCallback(callback)
                     .build();
@@ -42,10 +42,10 @@ public abstract class SearchRequestDatabase extends RoomDatabase {
 
     private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private SearchRequestDao wordDAO;
+        private SearchHistoryDao wordDAO;
         private String[] words = {"Star wars", "Steel", "Bond", "Man"};
 
-        PopulateDbAsyncTask(SearchRequestDatabase db) {
+        PopulateDbAsyncTask(SearchHistoryDatabase db) {
             this.wordDAO = db.dao();
         }
 

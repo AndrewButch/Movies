@@ -85,10 +85,6 @@ public class SearchHistoryFragment extends DaggerFragment {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
         inflater.inflate(R.menu.search_history_menu, menu);
-//        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
-//        if(!isTablet && isResumed()) {
-//
-//        }
     }
 
     @Override

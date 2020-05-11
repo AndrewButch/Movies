@@ -1,15 +1,14 @@
 package com.andrewbutch.movies.data;
 
-import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.andrewbutch.movies.data.database.MovieDatabase;
-import com.andrewbutch.movies.data.database.SearchRequestDatabase;
+import com.andrewbutch.movies.data.database.SearchHistoryDatabase;
 import com.andrewbutch.movies.data.database.dao.MovieDao;
-import com.andrewbutch.movies.data.database.dao.SearchRequestDao;
+import com.andrewbutch.movies.data.database.dao.SearchHistoryDao;
 import com.andrewbutch.movies.data.database.entity.MovieEntity;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
 import com.andrewbutch.movies.data.pojo.Movie;
@@ -35,11 +34,11 @@ public class MoviesRepository implements Repository {
     private static final String TAG = "MoviesRepository";
     private MovieLoader loader;
 
-    private SearchRequestDatabase searchRequestDatabase;
-    private SearchRequestDao searchRequestDao;
-
     private MovieDatabase movieDatabase;
     private MovieDao movieDao;
+
+    private SearchHistoryDatabase searchHistoryDatabase;
+    private SearchHistoryDao searchRequestDao;
 
     private MutableLiveData<SearchResource<List<SearchRequest>>> searchRequestsLiveData;
     private SearchResource<List<SearchRequest>> searchRequestsResource;
@@ -53,15 +52,17 @@ public class MoviesRepository implements Repository {
     private Map<String, MovieEntity> favoriteMovies;
 
     @Inject
-    public MoviesRepository(MovieLoader loader, Application application) {
+    public MoviesRepository(MovieLoader loader,
+                            MovieDatabase movieDatabase,
+                            SearchHistoryDatabase searchHistoryDatabase) {
         this.loader = loader;
 
         // Database
-        searchRequestDatabase = SearchRequestDatabase.getInstance(application);
-        searchRequestDao = searchRequestDatabase.dao();
+        this.movieDatabase = movieDatabase;
+        this.movieDao = this.movieDatabase.dao();
 
-        movieDatabase = MovieDatabase.getInstance(application);
-        movieDao = movieDatabase.dao();
+        this.searchHistoryDatabase = searchHistoryDatabase;
+        this.searchRequestDao = this.searchHistoryDatabase.dao();
 
         // Live Data
         searchRequestsLiveData = new MutableLiveData<>();
@@ -75,7 +76,6 @@ public class MoviesRepository implements Repository {
         currentMovie = new MutableLiveData<>();
         currentMovieResource = SearchResource.complete(null);
         currentMovie.setValue(currentMovieResource);
-
         init();
     }
 
@@ -186,8 +186,8 @@ public class MoviesRepository implements Repository {
                     String year = movie.getYear();
                     String durationg = movie.getDuration();
                     String rating = movie.getRating();
-                    MovieEntity movieEntity =
-                            new MovieEntity(id, posterUrl, title, year, durationg, rating, true);
+                    MovieEntity movieEntity = new MovieEntity(
+                            id, posterUrl, title, year, durationg, rating, true);
                     // insert entity into DB
                     movieDao.insert(movieEntity);
                     favoriteMovies.put(id, movieEntity);
@@ -265,7 +265,7 @@ public class MoviesRepository implements Repository {
     }
 
     private MovieEntity mapMoviePojoToEntity(Movie moviePojo) {
-        MovieEntity movieEntity = new MovieEntity(
+        return new MovieEntity(
                 moviePojo.getId(),
                 moviePojo.getPosterUrl(),
                 moviePojo.getTitle(),
@@ -273,6 +273,5 @@ public class MoviesRepository implements Repository {
                 moviePojo.getDuration(),
                 moviePojo.getRating(),
                 false);
-        return movieEntity;
     }
 }

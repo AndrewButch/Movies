@@ -3,13 +3,11 @@ package com.andrewbutch.movies.ui.searchmovie;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,8 +28,6 @@ public class SearchMovieFragment extends DaggerFragment implements MovieAdapter.
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
     private MainView view;
-    private SearchView searchView;
-    private MenuItem searchMenuItem;
 
     @Inject
     NetworkStatusWatcher networkStatusWatcher;

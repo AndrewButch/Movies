@@ -10,7 +10,7 @@ import com.andrewbutch.movies.data.database.entity.SearchRequest;
 import java.util.List;
 
 @Dao
-public interface SearchRequestDao {
+public interface SearchHistoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(SearchRequest request);
