@@ -4,4 +4,5 @@ public interface MainView {
     void showProgress();
     void hideProgress();
     void navToDetailMovie();
+    void activateSearch();
 }

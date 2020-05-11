@@ -3,20 +3,17 @@ package com.andrewbutch.movies.ui.detail;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.andrewbutch.movies.R;
-import com.andrewbutch.movies.data.pojo.Movie;
+import com.andrewbutch.movies.data.database.entity.MovieEntity;
 import com.andrewbutch.movies.ui.main.MainView;
 import com.andrewbutch.movies.ui.main.viewmodel.MainViewModel;
 import com.squareup.picasso.Picasso;
@@ -27,21 +24,23 @@ import dagger.android.support.DaggerFragment;
 
 public class DetailFragment extends DaggerFragment {
     private MainView view;
-
     @Inject
     MainViewModel viewModel;
 
     private ImageView posterImage;
+    private Button addToFavorite;
     private TextView title;
     private TextView year;
     private TextView rating;
     private TextView duration;
 
+    private boolean isFavorite;
+    private String movieId;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -65,6 +64,18 @@ public class DetailFragment extends DaggerFragment {
         year = view.findViewById(R.id.year_tv);
         rating = view.findViewById(R.id.rating_tv);
         duration = view.findViewById(R.id.duration_tv);
+        addToFavorite = view.findViewById(R.id.add_to_favorite_btn);
+        addToFavorite.setOnClickListener(v -> {
+            if (isFavorite) {
+                if (!movieId.isEmpty()) {
+                    viewModel.removeFromFavorite(movieId);
+//                    addToFavorite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_favorite_unchecked_24dp, 0, 0, 0);
+                }
+            } else {
+                viewModel.addToFavorite();
+//                addToFavorite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_favorite_checked_24dp, 0, 0, 0);
+            }
+        });
 
         viewModel.observeCurrentMovie().observe(getViewLifecycleOwner(), movieSearchResource -> {
             switch (movieSearchResource.status) {
@@ -73,7 +84,7 @@ public class DetailFragment extends DaggerFragment {
                     break;
                 case COMPLETE:
                     DetailFragment.this.view.hideProgress();
-                    Movie movie = movieSearchResource.data;
+                    MovieEntity movie = movieSearchResource.data;
                     if (movie == null) {
                         break;
                     }
@@ -87,6 +98,16 @@ public class DetailFragment extends DaggerFragment {
                             .placeholder(R.drawable.ic_local_movies_black_24dp)
                             .error(R.drawable.ic_error_outline_black_24dp)
                             .into(posterImage);
+                    isFavorite = movie.isFavorite();
+                    if (isFavorite) {
+                        addToFavorite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_favorite_checked_24dp, 0,0, 0);
+                        addToFavorite.setText(R.string.remove_from_favorite);
+                    } else {
+                        addToFavorite.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_favorite_unchecked_24dp, 0,0, 0);
+                        addToFavorite.setText(R.string.add_to_favorite);
+                    }
+                    addToFavorite.setVisibility(View.VISIBLE);
+                    movieId = movie.getId();
                     break;
                 case ERROR:
                     DetailFragment.this.view.hideProgress();
@@ -94,29 +115,4 @@ public class DetailFragment extends DaggerFragment {
             }
         });
     }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
-        if(!isTablet && isResumed()) {
-            menu.clear();
-            inflater.inflate(R.menu.detail_fragment_menu, menu);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemID = item.getItemId();
-        switch (itemID) {
-            case R.id.menu_fragment_add_to_favorite:
-                viewModel.addToFavorite();
-                Toast.makeText(getContext(), "Add to favorite", Toast.LENGTH_SHORT).show();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
 }

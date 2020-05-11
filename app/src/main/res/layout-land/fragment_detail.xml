@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="16dp">
 
     <ImageView
@@ -13,13 +14,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/add_to_favorite_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:drawableLeft="@drawable/ic_favorite_unchecked_24dp"
+        app:layout_constraintEnd_toEndOf="@+id/poster_image"
+        app:layout_constraintStart_toStartOf="@+id/poster_image"
+        app:layout_constraintTop_toBottomOf="@+id/poster_image"
+        android:text="@string/add_to_favorite"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/poster_image"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/add_to_favorite_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/poster_image"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,22 +40,22 @@
         <TextView
             android:id="@+id/title_tv"
             style="@style/DetailHeader"
-            android:text="Title" />
+            tools:text="Title" />
 
         <TextView
             android:id="@+id/year_tv"
             style="@style/DetailText"
-            android:text="Year" />
+            tools:text="Year" />
 
         <TextView
             android:id="@+id/duration_tv"
             style="@style/DetailText"
-            android:text="180min" />
+            tools:text="180min" />
 
         <TextView
             android:id="@+id/rating_tv"
             style="@style/DetailText"
-            android:text="IMDB: 3.6" />
+            tools:text="IMDB: 3.6" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

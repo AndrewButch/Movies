@@ -1,5 +1,7 @@
 package com.andrewbutch.movies.data;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,7 +23,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieLoader {
-
+    private static final String TAG = "!@#MovieLoader";
     private MoviesAPI moviesAPI;
 
 
@@ -72,7 +74,8 @@ public class MovieLoader {
 
             @Override
             public void onFailure(Call<Search> call, Throwable t) {
-                searchResult.setValue(SearchResource.error());
+                Log.d(TAG, "onFailure: ошибка при поиске" + t + "\n"+ call.request());
+                searchResult.setValue(SearchResource.error("Ошибка при поиске"));
                 searchResult.setValue(searchResource);
             }
         });
@@ -98,7 +101,8 @@ public class MovieLoader {
 
             @Override
             public void onFailure(Call<Movie> call, Throwable t) {
-                movieLoadingResource = SearchResource.error();
+                Log.d(TAG, "onFailure: Ошибка при загрузке по ID" + call.request());
+                movieLoadingResource = SearchResource.error("Ошибка при загрузке Movie by ID");
                 movieLoadingResult.setValue(movieLoadingResource);
             }
         });

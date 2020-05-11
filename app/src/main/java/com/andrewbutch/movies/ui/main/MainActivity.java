@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,8 +39,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public static final int RC_PERMISSION_INTERNET = 123;
 
     private SearchView searchView;
-    private FloatingActionButton fab;
     private MenuItem searchMenuItem;
+    private FloatingActionButton fab;
     private ProgressBar progressBar;
     private NavController navController;
     private AppBarLayout appBarLayout;
@@ -111,10 +110,9 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu: ");
         // Inflate the options menu from XML
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.search_movie_menu, menu);
 
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -125,12 +123,14 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 fab.hide();
+                bottomNavigationView.setVisibility(View.GONE);
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 fab.show();
+                bottomNavigationView.setVisibility(View.VISIBLE);
                 return true;
             }
         });
@@ -144,14 +144,8 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.menu_remove_search_requests:
-                viewModel.removeAllSearchRequests();
-                return true;
-            case R.id.menu_show_search_requests:
-                navToSearchRequests();
-                return true;
-            case R.id.menu_show_favorite:
-                navToFavorite();
+            case R.id.menu_search:
+                activateSearch();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -161,32 +155,48 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
     public void navToDetailMovie() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.detail_dest);
+//            navController.navigate(R.id.detail_dest);
         } else {
             // phone
-            navController.navigate(R.id.action_mainFragment_to_detailFragment);
+            int currentDestId = navController.getCurrentDestination().getId();
+            switch (currentDestId) {
+                case R.id.search_dest:
+                    navController.navigate(R.id.action_searchDest_to_detailDest);
+                    break;
+                case R.id.favorite_dest:
+                    navController.navigate(R.id.action_favoriteDest_to_detailDest);
+                    break;
+            }
         }
     }
 
     public void navToSearchRequests() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.search_requests_dest);
-
+            navController.navigate(R.id.search_history_dest);
         } else {
             // phone
-            navController.navigate(R.id.action_mainFragment_to_searchRequestsFragment);
+            navController.navigate(R.id.action_favoriteDest_to_searchHistoryDest);
         }
     }
 
     public void navToFavorite() {
         if (isTablet) {
             // tablet
-            navController.navigate(R.id.favorite_movies_dest);
-
+            navController.navigate(R.id.favorite_dest);
         } else {
             // phone
-            navController.navigate(R.id.action_mainFragment_to_favoriteMoviesFragment);
+            navController.navigate(R.id.action_favoriteDest_to_searchDest);
+        }
+    }
+
+    public void navToSearch() {
+        if (isTablet) {
+            // tablet
+            navController.navigate(R.id.search_dest);
+        } else {
+            // phone
+            navController.navigate(R.id.action_favoriteDest_to_searchDest);
         }
     }
 
@@ -241,49 +251,58 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView {
         fab = findViewById(R.id.fab);
         // fab activates search
         fab.setOnClickListener(v -> {
-            searchMenuItem.expandActionView();
-            searchMenuItem.getActionView().requestFocus();
+            activateSearch();
         });
         bottomNavigationView = findViewById(R.id.bottom_nav_view);
 
 
+        navController = Navigation.findNavController(this, R.id.main_nav_host);
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            fab.hide();
+            appBarLayout.setExpanded(true);
+            int destId = destination.getId();
+            switch (destId) {
+                case R.id.search_dest:
+                    fab.show();
+                    bottomNavigationView.setVisibility(View.VISIBLE);
+                    break;
+                case R.id.detail_dest:
+                    bottomNavigationView.setVisibility(View.GONE);
+                    break;
+                case R.id.favorite_dest:
+                    bottomNavigationView.setVisibility(View.VISIBLE);
+                    break;
+            }
+        });
+
         if(!isTablet) {
             // phone
             NavigationUI.setupWithNavController(bottomNavigationView,
-                    Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment));
-
-            navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-            navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                int destId = destination.getId();
-                switch (destId) {
-                    case R.id.main_dest:
-                        fab.show();
-                        bottomNavigationView.setVisibility(View.VISIBLE);
-                        appBarLayout.setExpanded(true);
-                        break;
-                    case R.id.detail_dest:
-                        fab.hide();
-                        bottomNavigationView.setVisibility(View.GONE);
-                        appBarLayout.setExpanded(true);
-                        break;
-                }
-            });
-            NavigationUI.setupWithNavController(toolbar, navController);
+                    Navigation.findNavController(MainActivity.this, R.id.main_nav_host));
         } else {
             // tablet
-            navController = Navigation.findNavController(this, R.id.nav_host_fragment_detail);
+            // manual setup bottomNavigationView
             bottomNavigationView.setOnNavigationItemSelectedListener(
                     item -> {
                         switch (item.getItemId()) {
-                            case R.id.search_requests_dest:
+                            case R.id.search_dest:
+                                navToSearch();
+                                return true;
+                            case R.id.search_history_dest:
                                 navToSearchRequests();
                                 return true;
-                            case R.id.favorite_movies_dest:
+                            case R.id.favorite_dest:
                                 navToFavorite();
                                 return true;
                         }
                         return false;
                     });
         }
+    }
+
+    @Override
+    public void activateSearch() {
+        searchMenuItem.expandActionView();
+        searchMenuItem.getActionView().requestFocus();
     }
 }

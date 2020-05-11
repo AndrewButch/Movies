@@ -5,11 +5,13 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.andrewbutch.movies.data.database.MovieDatabase;
 import com.andrewbutch.movies.data.database.SearchRequestDatabase;
 import com.andrewbutch.movies.data.database.dao.MovieDao;
 import com.andrewbutch.movies.data.database.dao.SearchRequestDao;
+import com.andrewbutch.movies.data.database.entity.MovieEntity;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
 import com.andrewbutch.movies.data.pojo.Movie;
 import com.andrewbutch.movies.data.pojo.MoviePreview;
@@ -18,19 +20,19 @@ import com.andrewbutch.movies.ui.main.SearchResource;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.CompletableObserver;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.core.Single;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MoviesRepository implements Repository {
@@ -49,6 +51,10 @@ public class MoviesRepository implements Repository {
     private MutableLiveData<SearchResource<List<MoviePreview>>> favoriteLiveData;
     private SearchResource<List<MoviePreview>> favoriteResource;
 
+    private MutableLiveData<SearchResource<MovieEntity>> currentMovie;
+    private SearchResource<MovieEntity> currentMovieResource;
+
+    private Map<String, MovieEntity> favoriteMovies;
 
     @Inject
     public MoviesRepository(MovieLoader loader, Application application) {
@@ -69,6 +75,31 @@ public class MoviesRepository implements Repository {
         favoriteLiveData = new MutableLiveData<>();
         favoriteResource = SearchResource.complete(null);
         favoriteLiveData.setValue(favoriteResource);
+
+        currentMovie = new MutableLiveData<>();
+        currentMovieResource = SearchResource.complete(null);
+        currentMovie.setValue(currentMovieResource);
+
+        init();
+    }
+
+    private void init() {
+        Observable.fromCallable(new Callable<List<MovieEntity>>() {
+            @Override
+            public List<MovieEntity> call() throws Exception {
+                return movieDao.getAllFavoriteMovies(true);
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<List<MovieEntity>>() {
+                    @Override
+                    public void accept(List<MovieEntity> movieEntities) throws Throwable {
+                        favoriteMovies = new HashMap<>();
+                        for (MovieEntity entity : movieEntities) {
+                            favoriteMovies.put(entity.getId(), entity);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -81,21 +112,8 @@ public class MoviesRepository implements Repository {
 
         })
                 .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete: " + searchRequest + " inserted");
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Log.d(TAG, "onError: " + e);
-                    }
+                .subscribe(() -> {
+                    Log.d(TAG, "onComplete: " + searchRequest + " inserted");
                 });
     }
 
@@ -119,43 +137,19 @@ public class MoviesRepository implements Repository {
 
     @Override
     public LiveData<SearchResource<List<SearchRequest>>> getAllSearchRequests() {
-
-        Observable.create(new ObservableOnSubscribe<List<SearchRequest>>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<List<SearchRequest>> emitter) throws Throwable {
-                emitter.onNext(searchRequestDao.selectAllByTime());
-                emitter.onComplete();
-            }
+        Observable.create((ObservableOnSubscribe<List<SearchRequest>>) emitter -> {
+            emitter.onNext(searchRequestDao.selectAllByTime());
+            emitter.onComplete();
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<SearchRequest>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
+                .subscribe(searchRequests -> {
+                    for (SearchRequest request : searchRequests) {
+                        Log.d(TAG, "Requests: " + Thread.currentThread().getName() + " " + request.getRequest());
                     }
-
-                    @Override
-                    public void onNext(@NonNull List<SearchRequest> searchRequests) {
-                        for (SearchRequest request : searchRequests) {
-                            Log.d(TAG, "Requests: " + Thread.currentThread().getName() + " " + request.getRequest());
-
-                        }
-                        searchRequestsResource = SearchResource.complete(searchRequests);
-                        searchRequestsLiveData.setValue(searchRequestsResource);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
+                    searchRequestsResource = SearchResource.complete(searchRequests);
+                    searchRequestsLiveData.setValue(searchRequestsResource);
                 });
-
         return searchRequestsLiveData;
     }
 
@@ -165,8 +159,33 @@ public class MoviesRepository implements Repository {
     }
 
     @Override
-    public LiveData<SearchResource<Movie>> getCurrentMovie() {
-        return loader.getMovie();
+    public LiveData<SearchResource<MovieEntity>> getCurrentMovie() {
+        loader.getMovie().observeForever(new Observer<SearchResource<Movie>>() {
+            @Override
+            public void onChanged(SearchResource<Movie> movieSearchResource) {
+                switch(movieSearchResource.status) {
+                    case LOADING:
+                        currentMovieResource = SearchResource.loading(null);
+                        currentMovie.setValue(currentMovieResource);
+                    case COMPLETE:
+                        if (movieSearchResource.data != null) {
+                            Movie pojo = movieSearchResource.data;
+                            MovieEntity movieEntity = mapMoviePojoToEntity(pojo);
+                            String movieId = movieEntity.getId();
+                            MovieEntity favoriteMovie = favoriteMovies.get(movieId);
+                            if (favoriteMovie != null) {
+                                movieEntity.setFavorite(favoriteMovie.isFavorite());
+                            }
+                            currentMovieResource = SearchResource.complete(movieEntity);
+                            currentMovie.setValue(currentMovieResource);
+                        }
+                    case ERROR:
+                        currentMovieResource = SearchResource.error("Ошибка при загрузке current movie");
+                        currentMovie.setValue(currentMovieResource);
+                }
+            }
+        });
+        return currentMovie;
     }
 
     @Override
@@ -174,24 +193,54 @@ public class MoviesRepository implements Repository {
         if (getCurrentMovie() != null) {
             final Movie movie = loader.getMovie().getValue().data;
             if (movie != null) {
-                Completable.fromRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(TAG, "Add favorite: " + Thread.currentThread().getName() + " " + movie.getTitle());
-                        String id = movie.getId();
-                        String posterUrl = movie.getPosterUrl();
-                        String title = movie.getTitle();
-                        String year = movie.getYear();
-                        String durationg = movie.getDuration();
-                        String rating = movie.getRating();
-                        com.andrewbutch.movies.data.database.entity.Movie movieDb =
-                                new com.andrewbutch.movies.data.database.entity.Movie(id, posterUrl, title, year, durationg, rating, true);
-                        movieDao.insert(movieDb);
-                    }
+                Single.fromCallable(() -> {
+                    String id = movie.getId();
+                    String posterUrl = movie.getPosterUrl();
+                    String title = movie.getTitle();
+                    String year = movie.getYear();
+                    String durationg = movie.getDuration();
+                    String rating = movie.getRating();
+                    MovieEntity movieEntity =
+                            new MovieEntity(id, posterUrl, title, year, durationg, rating, true);
+                    movieDao.insert(movieEntity);
+                    favoriteMovies.put(id, movieEntity);
+                    return movieEntity;
                 })
                         .subscribeOn(Schedulers.io())
-                        .subscribe();
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(movieEntity -> {
+                            // update live data
+                            currentMovieResource = SearchResource.complete(movieEntity);
+                            currentMovie.setValue(currentMovieResource);
+                        });
             }
+        }
+    }
+
+    @Override
+    public void removeFromFavorite(final String movieId) {
+        if (!movieId.isEmpty()) {
+            // remove movie by id
+            Single.fromCallable(() -> {
+                movieDao.delete(movieId);
+                List<MovieEntity> favoriteMovies = movieDao.getAllFavoriteMovies(true);
+                List<MoviePreview> movies = mapMovieListEntityToPojo(favoriteMovies);
+                return movies;
+            })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(movies -> {
+                        // update live data
+                        MovieEntity movieEntity = favoriteMovies.get(movieId);
+                        favoriteMovies.remove(movieId);
+                        if (movieEntity != null) {
+                            movieEntity.setFavorite(false);
+                            currentMovieResource = SearchResource.complete(movieEntity);
+                            currentMovie.setValue(currentMovieResource);
+                        }
+                        favoriteResource = SearchResource.complete(movies);
+                        favoriteLiveData.setValue(favoriteResource);
+                    });
         }
     }
 
@@ -200,28 +249,10 @@ public class MoviesRepository implements Repository {
         Observable.fromCallable(() -> movieDao.getAllFavoriteMovies(true))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<com.andrewbutch.movies.data.database.entity.Movie>>() {
-                    @Override
-                    public void onSubscribe(@NonNull Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onNext(List<com.andrewbutch.movies.data.database.entity.Movie> t) {
-                        List<MoviePreview> movies = mapToPojo(t);
-                        favoriteResource = SearchResource.complete(movies);
-                        favoriteLiveData.setValue(favoriteResource);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
+                .subscribe(t -> {
+                    List<MoviePreview> movies = mapMovieListEntityToPojo(t);
+                    favoriteResource = SearchResource.complete(movies);
+                    favoriteLiveData.setValue(favoriteResource);
                 });
         return favoriteLiveData;
     }
@@ -234,18 +265,35 @@ public class MoviesRepository implements Repository {
         loader.loadMovieById(movieId);
     }
 
-    private List<MoviePreview> mapToPojo(List<com.andrewbutch.movies.data.database.entity.Movie> dbMovies) {
+    private List<MoviePreview> mapMovieListEntityToPojo(List<MovieEntity> dbMovies) {
         List<MoviePreview> movies = new ArrayList<>();
-        for (com.andrewbutch.movies.data.database.entity.Movie movie : dbMovies) {
-            Movie pojoMovie = new Movie();
-            pojoMovie.setPosterUrl(movie.getPosterUrl());
-            pojoMovie.setTitle(movie.getTitle());
-            pojoMovie.setYear(movie.getYear());
-            pojoMovie.setRating(movie.getRating());
-            pojoMovie.setDuration(movie.getDuration());
-            pojoMovie.setId(movie.getId());
+        for (MovieEntity movie : dbMovies) {
+            MoviePreview pojoMovie = mapMovieEntityToPojo(movie);
             movies.add(pojoMovie);
         }
         return movies;
+    }
+
+    private MoviePreview mapMovieEntityToPojo(MovieEntity movieEntity) {
+        Movie pojoMovie = new Movie();
+        pojoMovie.setPosterUrl(movieEntity.getPosterUrl());
+        pojoMovie.setTitle(movieEntity.getTitle());
+        pojoMovie.setYear(movieEntity.getYear());
+        pojoMovie.setRating(movieEntity.getRating());
+        pojoMovie.setDuration(movieEntity.getDuration());
+        pojoMovie.setId(movieEntity.getId());
+        return pojoMovie;
+    }
+
+    private MovieEntity mapMoviePojoToEntity(Movie moviePojo) {
+        MovieEntity movieEntity = new MovieEntity(
+                moviePojo.getId(),
+                moviePojo.getPosterUrl(),
+                moviePojo.getTitle(),
+                moviePojo.getYear(),
+                moviePojo.getDuration(),
+                moviePojo.getRating(),
+                false);
+        return movieEntity;
     }
 }

@@ -17,8 +17,8 @@ public class SearchResource<T> {
         return new SearchResource<>(SearchStatus.LOADING, data, null);
     }
 
-    public static <T> SearchResource<T> error() {
-        return new SearchResource<>(SearchStatus.ERROR, null, null);
+    public static <T> SearchResource<T> error(@Nullable String msg) {
+        return new SearchResource<>(SearchStatus.ERROR, null, msg);
     }
 
     public static <T> SearchResource<T> complete(@Nullable T data) {

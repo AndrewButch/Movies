@@ -1,10 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
-        android:id="@id/favorite_movies_dest"
+        android:id="@id/favorite_dest"
         android:icon="@drawable/ic_favorite_checked_24dp"
-        android:title="@string/favorites" />
+        android:title="@string/favorites"/>
     <item
-        android:id="@id/search_requests_dest"
+        android:id="@id/search_dest"
+        android:icon="@drawable/ic_search_24dp"
+        android:title="@string/search" />
+    <item
+        android:id="@id/search_history_dest"
         android:icon="@drawable/ic_history_black_24dp"
         android:title="@string/history" />
 </menu>

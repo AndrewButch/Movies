@@ -20,9 +20,12 @@ import java.util.List;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteVH> {
     private List<MoviePreview> data;
     private LayoutInflater inflater;
+    private ViewHolderClickListener listener;
 
-    public FavoriteAdapter(Context context) {
+
+    public FavoriteAdapter(Context context, ViewHolderClickListener listener) {
         this.inflater = LayoutInflater.from(context);
+        this.listener = listener;
     }
 
     @NonNull
@@ -64,7 +67,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
             duration = itemView.findViewById(R.id.duration_tv);
             rating = itemView.findViewById(R.id.rating_tv);
             favoriteBtn = itemView.findViewById(R.id.btn_uncheck_favorite);
-
         }
 
         public void bind(MoviePreview movie) {
@@ -77,6 +79,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                     .placeholder(R.drawable.ic_local_movies_black_24dp)
                     .error(R.drawable.ic_error_outline_black_24dp)
                     .into(posterImage);
+            itemView.setOnClickListener(v -> listener.onClickDetail(movie.getId()));
+            favoriteBtn.setOnClickListener(v -> listener.onClickRemoveFavorite(movie.getId()));
         }
+    }
+
+    interface ViewHolderClickListener {
+        void onClickDetail(String movieID);
+        void onClickRemoveFavorite(String movieID);
     }
 }

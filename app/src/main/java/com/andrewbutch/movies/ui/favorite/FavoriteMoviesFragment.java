@@ -3,6 +3,8 @@ package com.andrewbutch.movies.ui.favorite;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,13 +24,20 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
-public class FavoriteMoviesFragment extends DaggerFragment {
+public class FavoriteMoviesFragment extends DaggerFragment implements FavoriteAdapter.ViewHolderClickListener {
     private RecyclerView recyclerView;
     private FavoriteAdapter adapter;
     private MainView view;
 
     @Inject
     MainViewModel viewModel;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -49,7 +58,7 @@ public class FavoriteMoviesFragment extends DaggerFragment {
         recyclerView = view.findViewById(R.id.favorites_recycler);
         recyclerView.hasFixedSize();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new FavoriteAdapter(getContext());
+        adapter = new FavoriteAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
 
         viewModel.observeFavorites().observe(getViewLifecycleOwner(), favorites -> {
@@ -70,5 +79,22 @@ public class FavoriteMoviesFragment extends DaggerFragment {
                     break;
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+    }
+
+    @Override
+    public void onClickDetail(String movieID) {
+        viewModel.setCurrentMovieID(movieID);
+        view.navToDetailMovie();
+    }
+
+    @Override
+    public void onClickRemoveFavorite(String movieID) {
+        viewModel.removeFromFavorite(movieID);
     }
 }

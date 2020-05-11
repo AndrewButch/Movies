@@ -1,8 +1,11 @@
-package com.andrewbutch.movies.ui.searchrequests;
+package com.andrewbutch.movies.ui.searchhistory;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,7 +25,7 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
-public class SearchRequestsFragment extends DaggerFragment {
+public class SearchHistoryFragment extends DaggerFragment {
     private MainView view;
     private RecyclerView recyclerView;
     private SearchAdapter adapter;
@@ -30,6 +33,11 @@ public class SearchRequestsFragment extends DaggerFragment {
     @Inject
     MainViewModel viewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -40,7 +48,7 @@ public class SearchRequestsFragment extends DaggerFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_search_requests, container, false);
+        View v = inflater.inflate(R.layout.fragment_search_history, container, false);
         return v;
     }
 
@@ -56,20 +64,41 @@ public class SearchRequestsFragment extends DaggerFragment {
         viewModel.observeSearchRequests().observe(getViewLifecycleOwner(), searchRequests -> {
             switch (searchRequests.status) {
                 case LOADING:
-                    SearchRequestsFragment.this.view.showProgress();
+                    SearchHistoryFragment.this.view.showProgress();
                     break;
                 case COMPLETE:
-                    SearchRequestsFragment.this.view.hideProgress();
+                    SearchHistoryFragment.this.view.hideProgress();
                     List<SearchRequest> requests = searchRequests.data;
                     if (requests != null) {
                         adapter.setData(requests);
                     }
                     break;
                 case ERROR:
-                    SearchRequestsFragment.this.view.hideProgress();
+                    SearchHistoryFragment.this.view.hideProgress();
                     break;
             }
         });
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.search_history_menu, menu);
+//        boolean isTablet = getResources().getBoolean(R.bool.isTablet);
+//        if(!isTablet && isResumed()) {
+//
+//        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemID = item.getItemId();
+        switch (itemID) {
+            case R.id.menu_remove_search_requests:
+                viewModel.removeAllSearchRequests();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

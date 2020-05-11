@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.andrewbutch.movies.data.database.entity.Movie;
+import com.andrewbutch.movies.data.database.entity.MovieEntity;
 
 import java.util.List;
 
@@ -15,17 +15,24 @@ import java.util.List;
 public interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Movie movie);
+    void insert(MovieEntity movie);
+
+    @Query("SELECT * FROM movie_table WHERE id = :id")
+    MovieEntity get(String id);
+
+    @Query("SELECT * FROM movie_table LIMIT 1")
+    MovieEntity[] getAnyMovie();
 
     @Update
-    void update(Movie movie);
+    void update(MovieEntity movie);
 
     @Delete
-    void delete(Movie movie);
+    void delete(MovieEntity movie);
+
+    @Query("DELETE FROM movie_table WHERE id = :id")
+    void delete(String id);
 
     @Query("SELECT * FROM movie_table WHERE favorite = :isFavorite ")
-    List<Movie> getAllFavoriteMovies(boolean isFavorite);
+    List<MovieEntity> getAllFavoriteMovies(boolean isFavorite);
 
-//    @Query("SELECT * FROM movie_table")
-//    List<Movie> getAllFavoriteMovies();
 }

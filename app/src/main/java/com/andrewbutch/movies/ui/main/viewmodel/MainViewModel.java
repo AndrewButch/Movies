@@ -3,8 +3,8 @@ package com.andrewbutch.movies.ui.main.viewmodel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.andrewbutch.movies.data.database.entity.MovieEntity;
 import com.andrewbutch.movies.data.database.entity.SearchRequest;
-import com.andrewbutch.movies.data.pojo.Movie;
 import com.andrewbutch.movies.data.pojo.MoviePreview;
 import com.andrewbutch.movies.domain.Repository;
 import com.andrewbutch.movies.ui.main.SearchResource;
@@ -35,7 +35,7 @@ public class MainViewModel extends ViewModel {
         repository.setCurrentMovieId(movieID);
     }
 
-    public LiveData<SearchResource<Movie>> observeCurrentMovie() {
+    public LiveData<SearchResource<MovieEntity>> observeCurrentMovie() {
         return repository.getCurrentMovie();
     }
 
@@ -52,6 +52,11 @@ public class MainViewModel extends ViewModel {
     public void addToFavorite() {
         repository.addToFavorite();
     }
+
+    public void removeFromFavorite(String movieId) {
+        repository.removeFromFavorite(movieId);
+    }
+
     public LiveData<SearchResource<List<MoviePreview>>> observeFavorites() {
         return repository.getFavoriteMovies();
     }

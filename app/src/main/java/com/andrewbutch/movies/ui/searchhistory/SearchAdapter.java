@@ -1,4 +1,4 @@
-package com.andrewbutch.movies.ui.searchrequests;
+package com.andrewbutch.movies.ui.searchhistory;
 
 import android.content.Context;
 import android.view.LayoutInflater;

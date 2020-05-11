@@ -3,27 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/favorite_movies_dest">
-    <fragment
-        android:id="@+id/detail_dest"
-        android:name="com.andrewbutch.movies.ui.detail.DetailFragment"
-        tools:layout="@layout/fragment_detail">
-    </fragment>
+    app:startDestination="@id/favorite_dest">
 
     <fragment
-        android:id="@+id/main_dest"
-        android:name="com.andrewbutch.movies.ui.searchmovie.MainFragment"
+        android:id="@+id/search_dest"
+        android:name="com.andrewbutch.movies.ui.searchmovie.SearchMovieFragment"
         android:label="Movie"
-        tools:layout="@layout/fragment_main">
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_search_dest_to_search_history_dest"
+            app:destination="@id/search_history_dest"/>
+        <action
+            android:id="@+id/action_search_dest_to_favorite_dest"
+            app:destination="@id/favorite_dest"/>
     </fragment>
     <fragment
-        android:id="@+id/search_requests_dest"
-        android:name="com.andrewbutch.movies.ui.searchrequests.SearchRequestsFragment"
-        android:label="SearchRequestsFragment"
-        tools:layout="@layout/fragment_search_requests"/>
+        android:id="@+id/search_history_dest"
+        android:name="com.andrewbutch.movies.ui.searchhistory.SearchHistoryFragment"
+        android:label="Search history"
+        tools:layout="@layout/fragment_search_history">
+        <action
+            android:id="@+id/action_search_history_dest_to_favorite_dest"
+            app:destination="@id/favorite_dest"/>
+        <action
+            android:id="@+id/action_search_history_dest_to_search_dest"
+            app:destination="@id/search_dest"/>
+    </fragment>
     <fragment
-        android:id="@+id/favorite_movies_dest"
+        android:id="@+id/favorite_dest"
         android:name="com.andrewbutch.movies.ui.favorite.FavoriteMoviesFragment"
-        android:label="FavoriteMoviesFragment"
-        tools:layout="@layout/fragment_favorite_movie"/>
+        android:label="Favorite movies"
+        tools:layout="@layout/fragment_favorite_movie">
+        <action
+            android:id="@+id/action_favorite_dest_to_search_dest"
+            app:destination="@id/search_dest"/>
+        <action
+            android:id="@+id/action_favorite_dest_to_search_history_dest"
+            app:destination="@id/search_history_dest"/>
+    </fragment>
 </navigation>

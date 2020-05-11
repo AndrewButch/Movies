@@ -3,11 +3,13 @@ package com.andrewbutch.movies.ui.searchmovie;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,16 +25,23 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
-public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHolderClickListener {
+public class SearchMovieFragment extends DaggerFragment implements MovieAdapter.ViewHolderClickListener {
     private static final String TAG = "MainFragment";
     private RecyclerView recyclerView;
     private MovieAdapter adapter;
     private MainView view;
+    private SearchView searchView;
+    private MenuItem searchMenuItem;
 
     @Inject
     NetworkStatusWatcher networkStatusWatcher;
     @Inject
     MainViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -43,7 +52,7 @@ public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHol
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_main, container, false);
+        View v = inflater.inflate(R.layout.fragment_search, container, false);
         return v;
     }
 
@@ -73,7 +82,6 @@ public class MainFragment extends DaggerFragment implements MovieAdapter.ViewHol
                     break;
             }
         });
-//        RxLoad();
     }
 
     @Override
